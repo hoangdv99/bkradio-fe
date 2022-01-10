@@ -11,14 +11,28 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      {
+        rel: 'dns-prefetch',
+        href: '//fonts.googleapis.com',
+      }
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: [
+    '@/assets/scss/app.scss',
+    '@fortawesome/fontawesome-svg-core/styles.css'
+  ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [
+    '~/plugins/fontawesome.js'
+  ],
+
+  publicRuntimeConfig: {
+    NODE_ENV: process.env.NODE_ENV,
+  },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -34,4 +48,8 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  server: {
+    port: process.env.PORT
+  },
 }
