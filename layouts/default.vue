@@ -4,6 +4,7 @@
       <layout-header></layout-header>
       <main class="main">
         <nuxt class="content"></nuxt>
+        <common-sidebar v-if="showSidebar"></common-sidebar>
       </main>
       <layout-footer></layout-footer>
     </div>
@@ -15,6 +16,9 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons'
+import { createNamespacedHelpers } from '@/util'
+const { $get } = createNamespacedHelpers('layout')
+
 export default {
   name: 'DefaultLayout',
   components: {
@@ -25,6 +29,9 @@ export default {
       angleUpIcon: faAngleUp,
       hide: true,
     }
+  },
+  computed: {
+    showSidebar: $get('showSidebar')
   },
   mounted() {
     window.addEventListener('scroll', this.updateScroll)
@@ -55,7 +62,13 @@ export default {
     }
   }
   > .layout > .main {
+    display: flex;
+    margin-top: 30px;
+    padding: 0 15px;
     min-height: 80vh;
+  }
+  > .layout > .main > .content {
+    flex: 8;
   }
   > .pagetop {
     width: 35px;
