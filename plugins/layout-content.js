@@ -7,6 +7,7 @@ Vue.mixin({
     if(this.$options.layoutContent) {
       const layoutContent = this.$options.layoutContent.apply(this)
       $commit('SET_SHOW_SIDEBAR', layoutContent.showSidebar || false)
+      $commit('SET_BREADCRUMBS', layoutContent.breadcrumbs || [] )
     }
   },
 })

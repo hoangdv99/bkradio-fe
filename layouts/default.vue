@@ -2,6 +2,7 @@
   <div class="default-layout">
     <div class="layout">
       <layout-header></layout-header>
+      <layout-breadcrumbs></layout-breadcrumbs>
       <main class="main">
         <nuxt class="content"></nuxt>
         <common-sidebar v-if="showSidebar"></common-sidebar>
@@ -31,7 +32,7 @@ export default {
     }
   },
   computed: {
-    showSidebar: $get('showSidebar')
+    showSidebar: $get('showSidebar'),
   },
   mounted() {
     window.addEventListener('scroll', this.updateScroll)
@@ -63,8 +64,8 @@ export default {
   }
   > .layout > .main {
     display: flex;
-    margin-top: 30px;
-    padding: 0 15px;
+    margin-top: 15px;
+    padding: 0 30px;
     min-height: 80vh;
   }
   > .layout > .main > .content {
