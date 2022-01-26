@@ -29,7 +29,8 @@ export default {
   plugins: [
     '~/plugins/fontawesome.js',
     '~/plugins/layout-content.js',
-    '~/plugins/vue-plyr',
+    { src: '~/plugins/vue-plyr', mode: 'client'},
+    { src: '~/plugins/vue-star-rating', mode: 'client'},
   ],
 
   publicRuntimeConfig: {

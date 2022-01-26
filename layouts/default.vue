@@ -64,8 +64,8 @@ export default {
   }
   > .layout > .main {
     display: flex;
-    margin-top: 30px;
-    padding: 0 15px;
+    margin-top: 15px;
+    padding: 0 30px;
     min-height: 80vh;
   }
   > .layout > .main > .content {

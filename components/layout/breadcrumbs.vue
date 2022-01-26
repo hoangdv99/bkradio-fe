@@ -29,7 +29,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-breadcrumbs {
-  margin: 15px 30px;
+  margin: 15px 30px 0;
   color: #999999;
   > .link {
     text-decoration: none;
