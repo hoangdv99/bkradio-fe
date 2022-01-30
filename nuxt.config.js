@@ -31,10 +31,12 @@ export default {
     '~/plugins/layout-content.js',
     { src: '~/plugins/vue-plyr', mode: 'client'},
     { src: '~/plugins/vue-star-rating', mode: 'client'},
+    '~/apis'
   ],
 
   publicRuntimeConfig: {
     NODE_ENV: process.env.NODE_ENV,
+    API_BASE_URL: process.env.API_BASE_URL,
   },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
