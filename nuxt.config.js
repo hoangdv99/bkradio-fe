@@ -29,8 +29,8 @@ export default {
   plugins: [
     '~/plugins/fontawesome.js',
     '~/plugins/layout-content.js',
-    { src: '~/plugins/vue-plyr', mode: 'client'},
-    { src: '~/plugins/vue-star-rating', mode: 'client'},
+    { src: '~/plugins/vue-plyr', mode: 'client' },
+    { src: '~/plugins/vue-star-rating', mode: 'client' },
     '~/apis'
   ],
 
@@ -46,10 +46,41 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
+    '@nuxtjs/vuetify',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [],
+  modules: [
+    '@nuxtjs/auth',
+  ],
+
+  auth: {
+    strategies: {
+      local: {
+        scheme: "refresh",
+        token: {
+          property: "token",
+          global: true,
+          required: true,
+          type: "Bearer"
+        },
+        user: {
+          property: "user",
+          autoFetch: true
+        },
+        refreshToken: {
+          property: "refresh_token",
+          data: "refresh_token",
+        },
+        endpoints: {
+          login: { url: "/auth/login", method: "post" },
+          refresh: { url: "/auth/refresh-token", method: "post" },
+          logout: false, //  we don't have an endpoint for our logout in our API and we just remove the token from localstorage
+          user: { url: "/auth/user", method: "get" }
+        }
+      }
+    }
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},

@@ -46,6 +46,17 @@
       <input type="text" class="input" placeholder="Nhập nội dung cần tìm..." />
       <font-awesome-icon :icon="searchIcon" class="icon" />
     </div>
+    <div class="account">
+      <img
+        src="~/assets/images/default-avatar.jpg"
+        alt="Avatar"
+        class="avatar"
+      />
+      <ul class="sub-menu">
+        <a href="" class="item">Truyện ngắn</a>
+        <a href="" class="item">Truyện dài</a>
+      </ul>
+    </div>
   </header>
 </template>
 <script>
@@ -107,6 +118,9 @@ export default {
       transition: 0.3s;
     }
   }
+  > .menu > .item > .sub-menu {
+    position: absolute;
+  }
   > .menu > .item > .link {
     display: block;
     padding: 0 14px;
@@ -121,7 +135,6 @@ export default {
       &::before {
         content: '';
         position: absolute;
-        margin-top: 2px;
         right: 12px;
         top: 50%;
         bottom: auto;
@@ -153,18 +166,32 @@ export default {
     top: 14px;
     cursor: pointer;
   }
+  > .account {
+    display: flex;
+    justify-content: center;
+    &:hover > .sub-menu {
+      display: block;
+    }
+  }
+  > .account > .avatar {
+    margin: auto;
+    vertical-align: middle;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
 }
 .sub-menu {
   display: none;
   padding: 15px;
   width: 230px;
-  position: absolute;
   background-color: #627c83;
   border-top: 2px solid #08f;
   border-color: #9ebaa0;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  .item + .sub-menu {
+  > .item + .sub-menu {
     &:hover {
       display: block;
       top: 20px;
