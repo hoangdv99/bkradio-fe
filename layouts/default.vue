@@ -50,6 +50,7 @@ export default {
 <style lang="scss" scoped>
 .default-layout {
   > .layout {
+    display: block;
     max-width: 1230px;
     background: #fff;
     position: relative;

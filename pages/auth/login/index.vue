@@ -4,17 +4,29 @@
       <h3 class="title">Đăng nhập</h3>
       <div class="field">
         <span class="label">Tên tài khoản</span>
-        <input v-model="loginData.username" type="text" placeholder="Nhập tên tài khoản" class="input" />
+        <input
+          v-model="loginData.username"
+          type="text"
+          placeholder="Nhập tên tài khoản"
+          class="input"
+        />
         <font-awesome-icon :icon="userIcon" class="icon"></font-awesome-icon>
       </div>
       <div class="field">
         <span class="label">Mật khẩu</span>
-        <input v-model="loginData.password" type="password" placeholder="Nhập mật khẩu" class="input" />
+        <input
+          v-model="loginData.password"
+          type="password"
+          placeholder="Nhập mật khẩu"
+          class="input"
+        />
         <font-awesome-icon :icon="lockIcon" class="icon"></font-awesome-icon>
       </div>
       <a href="#" class="link">Quên mật khẩu?</a>
       <button type="submit" class="btn">Đăng nhập</button>
-      <NuxtLink to="/auth/signup" class="link">Chưa có tài khoản? Đăng kí ngay</NuxtLink>
+      <NuxtLink to="/auth/signup" class="link"
+        >Chưa có tài khoản? Đăng kí ngay</NuxtLink
+      >
     </form>
   </div>
 </template>
@@ -22,6 +34,11 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons'
 export default {
+  layoutContent() {
+    return {
+      showSidebar: false
+    }
+  },
   name: 'LoginPage',
   components: {
     FontAwesomeIcon,
@@ -38,11 +55,14 @@ export default {
   },
   methods: {
     async login() {
-      const res = await this.$auth.loginWith('local', {
-        data: this.loginData,
-      })
-      this.$router.replace('/')
-      console.log(res)
+      try {
+        await this.$auth.loginWith('local', {
+          data: this.loginData,
+        })
+        this.$router.push({ path: '/' })
+      } catch (err) {
+        console.log(err)
+      }
     },
   },
 }

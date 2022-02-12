@@ -51,13 +51,14 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    '@nuxtjs/auth',
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next',
   ],
 
   auth: {
     strategies: {
       local: {
-        scheme: "refresh",
+        // scheme: "refresh",
         token: {
           property: "token",
           global: true,
@@ -66,17 +67,17 @@ export default {
         },
         user: {
           property: "user",
-          autoFetch: true
+          autoFetch: true,
         },
-        refreshToken: {
-          property: "refresh_token",
-          data: "refresh_token",
-        },
+        // refreshToken: {
+        //   property: "refresh_token",
+        //   data: "refresh_token",
+        // },
         endpoints: {
-          login: { url: "/auth/login", method: "post" },
-          refresh: { url: "/auth/refresh-token", method: "post" },
-          logout: false, //  we don't have an endpoint for our logout in our API and we just remove the token from localstorage
-          user: { url: "/auth/user", method: "get" }
+          login: { url: "/auth/signin", method: "post" },
+          // refresh: { url: "/auth/refresh-token", method: "post" },
+          logout: false,
+          user: { url: "/auth/me", method: "get" }
         }
       }
     }
@@ -84,6 +85,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  axios: {
+    baseURL: process.env.API_BASE_URL
+  },
 
   server: {
     port: process.env.PORT

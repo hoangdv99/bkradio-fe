@@ -26,16 +26,8 @@
       <li class="item">
         <a href="" class="link -dropdown">Giọng đọc</a>
         <ul class="sub-menu">
-          <a href="" class="item">Nam</a>
-          <ul class="sub-menu">
-            <a href="" class="item">Trần Ngọc San</a>
-            <a href="" class="item">Kẻ Trộm Hương</a>
-          </ul>
-          <a href="" class="item">Nữ</a>
-          <ul class="sub-menu">
-            <a href="" class="item">Kim Phượng</a>
-            <a href="" class="item">Thy Mai</a>
-          </ul>
+          <a href="" class="item">Trần Ngọc San</a>
+          <a href="" class="item">Kẻ Trộm Hương</a>
         </ul>
       </li>
       <li class="item">
@@ -46,17 +38,18 @@
       <input type="text" class="input" placeholder="Nhập nội dung cần tìm..." />
       <font-awesome-icon :icon="searchIcon" class="icon" />
     </div>
-    <div class="account">
+    <div v-if="isAuthenticated" class="account">
       <img
         src="~/assets/images/default-avatar.jpg"
         alt="Avatar"
         class="avatar"
       />
       <ul class="sub-menu">
-        <a href="" class="item">Truyện ngắn</a>
-        <a href="" class="item">Truyện dài</a>
+        <NuxtLink to="/admin/audio" class="item">Quản lý audio</NuxtLink>
+        <div class="item" @click="logout">Đăng xuất</div>
       </ul>
     </div>
+    <NuxtLink v-else to="/auth/login" class="auth">Đăng nhập</NuxtLink>
   </header>
 </template>
 <script>
@@ -72,6 +65,16 @@ export default {
       searchIcon: faSearch,
     }
   },
+  computed: {
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated
+    }
+  },
+  methods: {
+    async logout() {
+      await this.$auth.logout()
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -169,6 +172,8 @@ export default {
   > .account {
     display: flex;
     justify-content: center;
+    position: relative;
+    width: 120px;
     &:hover > .sub-menu {
       display: block;
     }
@@ -181,6 +186,25 @@ export default {
     border-radius: 50%;
     cursor: pointer;
   }
+  > .account > .sub-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+  }
+  > .auth {
+    display: block;
+    padding: 0 14px;
+    height: 73px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
+    line-height: 73px;
+    cursor: pointer;
+    &:hover {
+      color: #9ebaa0;
+    }
+  }
 }
 .sub-menu {
   display: none;
@@ -191,6 +215,7 @@ export default {
   border-color: #9ebaa0;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  z-index: 1;
   > .item + .sub-menu {
     &:hover {
       display: block;
@@ -206,6 +231,7 @@ export default {
     color: #fff;
     line-height: 20px;
     padding: 8px 10px;
+    cursor: pointer;
     &:hover {
       color: #9ebaa0;
       + .sub-menu {
