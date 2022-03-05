@@ -1,18 +1,31 @@
 <template>
-  <div class="default-layout">
-    <div class="layout">
-      <layout-header></layout-header>
-      <layout-breadcrumbs></layout-breadcrumbs>
-      <main class="main">
-        <nuxt class="content"></nuxt>
-        <common-sidebar v-if="showSidebar"></common-sidebar>
-      </main>
-      <layout-footer></layout-footer>
+  <v-app>
+    <div class="default-layout">
+      <div class="layout">
+        <layout-header></layout-header>
+        <layout-breadcrumbs></layout-breadcrumbs>
+        <main class="main">
+          <nuxt class="content"></nuxt>
+          <common-sidebar v-if="showSidebar"></common-sidebar>
+        </main>
+        <layout-footer></layout-footer>
+      </div>
+      <div :class="'pagetop' + (hide ? ' -hide' : '')" @click="goTop">
+        <font-awesome-icon :icon="angleUpIcon" />
+      </div>
+      <v-snackbar
+        :value="snackbar.showing"
+        :timeout="-1"
+        :color="snackbar.color"
+        top
+        right
+        absolute
+        style="z-index: 9999"
+      >
+        {{ snackbar.text }}
+      </v-snackbar>
     </div>
-    <div :class="'pagetop' + (hide ? ' -hide' : '')" @click="goTop">
-      <font-awesome-icon :icon="angleUpIcon" />
-    </div>
-  </div>
+  </v-app>
 </template>
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -33,6 +46,7 @@ export default {
   },
   computed: {
     showSidebar: $get('showSidebar'),
+    snackbar: $get('snackbar'),
   },
   mounted() {
     window.addEventListener('scroll', this.updateScroll)
@@ -43,7 +57,7 @@ export default {
     },
     updateScroll() {
       this.hide = !!(window.scrollY < 220)
-    }
+    },
   },
 }
 </script>

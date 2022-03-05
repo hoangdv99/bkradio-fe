@@ -42,7 +42,6 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons'
-import { apis } from '@/apis'
 export default {
   name: 'LoginPage',
   components: {
@@ -61,7 +60,7 @@ export default {
   },
   methods: {
     async signup() {
-      const res = await apis.audioApi.post('auth/signup', {
+      const res = await this.$axios.post('auth/signup', {
         json: {
           username: this.signupData.username,
           password: this.signupData.password,

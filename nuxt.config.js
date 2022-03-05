@@ -1,3 +1,5 @@
+import { i18n } from './config'
+
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -29,6 +31,7 @@ export default {
   plugins: [
     '~/plugins/fontawesome.js',
     '~/plugins/layout-content.js',
+    '~/plugins/vuetify.js',
     { src: '~/plugins/vue-plyr', mode: 'client' },
     { src: '~/plugins/vue-star-rating', mode: 'client' },
     '~/apis'
@@ -53,6 +56,8 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
+    '@vt7/s-vuetify/nuxt',
+    ['nuxt-i18n', i18n],
   ],
 
   auth: {
@@ -69,13 +74,8 @@ export default {
           property: "user",
           autoFetch: true,
         },
-        // refreshToken: {
-        //   property: "refresh_token",
-        //   data: "refresh_token",
-        // },
         endpoints: {
           login: { url: "/auth/signin", method: "post" },
-          // refresh: { url: "/auth/refresh-token", method: "post" },
           logout: false,
           user: { url: "/auth/me", method: "get" }
         }
@@ -84,7 +84,9 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    transpile: [({ isLegacy }) => isLegacy && 'vuetify/lib']
+  },
 
   axios: {
     baseURL: process.env.API_BASE_URL
