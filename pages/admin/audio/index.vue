@@ -7,8 +7,6 @@
 <script>
 import PageTitle from './-title.vue'
 import AudioList from './-table.vue'
-import { createNamespacedHelpers } from '~/util'
-const { $get, $dispatch } = createNamespacedHelpers('audios')
 
 export default {
   layoutContent() {
@@ -18,7 +16,7 @@ export default {
         {
           name: 'Quản lý audio',
           url: '/admin/audio',
-        }
+        },
       ],
     }
   },
@@ -28,11 +26,5 @@ export default {
     AudioList,
   },
   middleware: ['isAuthenticated', 'isAdmin'],
-  computed: {
-    audios: $get('audios')
-  },
-  created() {
-    if (!this.audios.length) $dispatch('getAudios')
-  }
 }
 </script>
