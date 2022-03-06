@@ -33,23 +33,25 @@
   </v-data-table>
 </template>
 <script>
-import Audio from '@/models/audios'
+import { createNamespacedHelpers } from '~/util'
+const { $get, $dispatch } = createNamespacedHelpers('audios')
+
 export default {
   name: 'AudioList',
   data() {
     return {
       headers,
-      audioList: [],
     }
   },
-  async fetch() {
-    this.audioList = await Audio.getAudios()
-  },
   computed: {
+    audioList: $get('audios'),
     heightCard() {
       const { top, bar } = this.$vuetify.application
       return `calc(100vh - ${top + bar}px - 200px)`
     },
+  },
+  mounted() {
+    if (!this.audioList.length) $dispatch('getAudios')
   },
   methods: {
     convertStatus(status) {

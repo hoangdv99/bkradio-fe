@@ -16,6 +16,9 @@ export const mutations = {
   ADD_AUDIO(state, audio) {
     state.audios.push(audio)
   },
+  SET_AUDIOS(state, audios) {
+    state.audios = audios
+  },
   ADD_VOICE(state, voice) {
     state.voices.push(voice)
   },

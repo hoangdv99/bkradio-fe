@@ -224,7 +224,7 @@ export default {
       )
     },
   },
-  async created() {
+  async mounted() {
     if (!this.authors.length) $dispatch('getAuthors')
     if (!this.voices.length) $dispatch('getVoices')
     this.topics = await Audios.getTopics()
