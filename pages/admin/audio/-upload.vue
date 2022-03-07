@@ -163,7 +163,7 @@
             color="error"
             text
             :disabled="isUploading"
-            @click="dialog = false"
+            @click="close"
           >
             Đóng
           </v-btn>
@@ -210,6 +210,7 @@ export default {
         audioUrl: null,
         topicIds: []
       },
+      thumbnail: null,
     }
   },
   computed: {
@@ -255,14 +256,16 @@ export default {
       this.isUploading = false
     },
     onThumbnailChanged(e) {
-      const thumbnail = e.target.files[0]
-      this.audio.thumbnailUrl = URL.createObjectURL(thumbnail)
+      this.thumbnail = e.target.files[0]
+      this.audio.thumbnailUrl = URL.createObjectURL(this.thumbnail)
     },
-    save() {
+    async save() {
+      if (this.thumbnail) await this.uploadThumbnail()
       $dispatch('createNewAudio', {
         ...this.audio,
         userId: this.$auth.user.userId
-      })
+      }) 
+      $dispatch('getAudios')
       this.audio = {
         title: null,
         description: null,
@@ -273,9 +276,29 @@ export default {
       }
       this.dialog = false
     },
+    close() {
+      this.audio = {
+        title: null,
+        description: null,
+        authorId: null,
+        voiceId: null,
+        thumbnailUrl: null,
+        audioUrl: null,
+      }
+      this.selectedFile = null
+      this.dialog = false
+    },
     generateUniqueFileName(fileName) {
       return Math.floor(Date.now() + Math.random()) + '_' + fileName
     },
+    async uploadThumbnail() {
+      const { signedUrl, fileUrl } = await Audios.getS3PresignedUrl({
+        fileName: this.generateUniqueFileName(this.thumbnail.name),
+        fileType: 'image'
+      })
+      this.audio.thumbnailUrl = fileUrl
+      await Audios.uploadToS3(signedUrl, this.thumbnail)
+    }
   },
 }
 </script>

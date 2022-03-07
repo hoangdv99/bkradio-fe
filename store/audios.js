@@ -36,8 +36,8 @@ export const mutations = {
 export const actions = {
   async createNewAudio({ commit }, audio) {
     try {
-      await Audios.create(audio)
-      commit('ADD_AUDIO', audio)
+      const newAudio = await Audios.create(audio)
+      commit('ADD_AUDIO', newAudio)
       $dispatch('setSnackbar', {
         showing: true,
         text: 'Thêm audio mới thành công',
