@@ -1,4 +1,4 @@
-// import ky from "ky-universal"
+import ky from "ky-universal"
 import { apis } from "~/apis"
 
 export default class Audios {
@@ -13,9 +13,9 @@ export default class Audios {
   }
 
   static async uploadToS3(signedUrl, file) {
-    // return await ky.put(signedUrl, {
-    //   body: file
-    // })
+    return await ky.put(signedUrl, {
+      body: file
+    })
   }
 
   static async create(audio) {
@@ -28,5 +28,13 @@ export default class Audios {
 
   static async getTopics() {
     return await apis.audioApi.get('topics').json()
+  }
+
+  static async getAudio(id) {
+    return await apis.audioApi.get(`audios/${id}`).json()
+  }
+
+  static async updateAudio(audio) {
+    return await apis.audioApi.put(`audios/${audio.id}`, { json: audio })
   }
 }

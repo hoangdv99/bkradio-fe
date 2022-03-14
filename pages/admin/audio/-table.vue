@@ -10,7 +10,7 @@
         />
         <div class="description">
           <p class="text-left mb-0 font-weight-medium">{{ item.title }}</p>
-          <p class="text-left mb-0">Thể loại: {{ item.topics.join(', ') }}</p>
+          <p class="text-left mb-0">Thể loại: {{ item.topics && item.topics.join(', ') }}</p>
           <p class="text-left mb-0">Giọng đọc: {{ item.voice }}</p>
           <p class="text-left mb-0">Tác giả: {{ item.author }}</p>
           <p class="text-left mb-0 summary">
@@ -22,8 +22,8 @@
     <template #[`item.status`]="{ item }">
       <span>{{ convertStatus(item.status) }}</span>
     </template>
-    <template #[`item.actions`]>
-      <v-btn class="mx-2" fab dark small color="amber">
+    <template #[`item.actions`]="{ item }">
+      <v-btn class="mx-2" fab dark small color="amber" @click="goToEditPage(item.id)">
         <v-icon dark> mdi-pencil </v-icon>
       </v-btn>
       <v-btn class="mx-2" fab dark small color="red">
@@ -57,6 +57,9 @@ export default {
     convertStatus(status) {
       if (status === 1) return 'Công khai'
       return 'Riêng tư'
+    },
+    goToEditPage(id) {
+      this.$router.push({ path: '/admin/audio/edit', query: { audioId: id } })
     },
   },
 }
