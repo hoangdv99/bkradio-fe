@@ -10,7 +10,9 @@
         />
         <div class="description">
           <p class="text-left mb-0 font-weight-medium">{{ item.title }}</p>
-          <p class="text-left mb-0">Thể loại: {{ item.topics && item.topics.join(', ') }}</p>
+          <p class="text-left mb-0">
+            Thể loại: {{ item.topics && item.topics.join(', ') }}
+          </p>
           <p class="text-left mb-0">Giọng đọc: {{ item.voice }}</p>
           <p class="text-left mb-0">Tác giả: {{ item.author }}</p>
           <p class="text-left mb-0 summary">
@@ -23,18 +25,34 @@
       <span>{{ convertStatus(item.status) }}</span>
     </template>
     <template #[`item.actions`]="{ item }">
-      <v-btn class="mx-2" fab dark small color="amber" @click="goToEditPage(item.id)">
+      <v-btn
+        class="mx-2"
+        fab
+        dark
+        small
+        color="amber"
+        @click="goToEditPage(item.id)"
+      >
         <v-icon dark> mdi-pencil </v-icon>
       </v-btn>
-      <v-btn class="mx-2" fab dark small color="red">
+      <v-btn
+        class="mx-2"
+        fab
+        dark
+        small
+        color="red"
+        @click="deleteAudio(item.id)"
+      >
         <v-icon dark> mdi-delete </v-icon>
       </v-btn>
     </template>
   </v-data-table>
 </template>
 <script>
+import Audios from '@/models/audios'
 import { createNamespacedHelpers } from '~/util'
 const { $get, $dispatch } = createNamespacedHelpers('audios')
+const layoutNamespaceHelpers = createNamespacedHelpers('layout')
 
 export default {
   name: 'AudioList',
@@ -60,6 +78,23 @@ export default {
     },
     goToEditPage(id) {
       this.$router.push({ path: '/admin/audio/edit', query: { audioId: id } })
+    },
+    async deleteAudio(id) {
+      try {
+        await Audios.deleteAudio(id)
+        layoutNamespaceHelpers.$dispatch('setSnackbar', {
+          showing: true,
+          text: 'Xóa audio thành công',
+          color: 'success',
+        })
+        await $dispatch('getAudios')
+      } catch (error) {
+        layoutNamespaceHelpers.$dispatch('setSnackbar', {
+          showing: true,
+          text: 'Có lỗi xảy ra',
+          color: 'error',
+        })
+      }
     },
   },
 }

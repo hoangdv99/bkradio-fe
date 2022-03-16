@@ -37,4 +37,8 @@ export default class Audios {
   static async updateAudio(audio) {
     return await apis.audioApi.put(`audios/${audio.id}`, { json: audio })
   }
+
+  static async deleteAudio(id) {
+    return await apis.audioApi.delete(`audios/${id}`)
+  }
 }
