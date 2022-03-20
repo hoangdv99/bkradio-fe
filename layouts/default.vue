@@ -78,6 +78,7 @@ export default {
     }
   }
   > .layout > .main {
+    display: flex;
     margin-top: 15px;
     padding: 0 30px;
   }

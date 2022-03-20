@@ -249,4 +249,7 @@ export default {
     width: 100%;
   }
 }
+.main {
+  display: block !important;
+}
 </style>

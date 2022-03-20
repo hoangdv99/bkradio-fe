@@ -28,20 +28,30 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
-        class="mx-2"
+        class="mx-0"
         fab
         dark
-        small
+        x-small
+        color="blue-grey"
+        @click="goToDetailPage(item.slug)"
+      >
+        <v-icon dark> mdi-eye </v-icon>
+      </v-btn>
+      <v-btn
+        class="mx-0"
+        fab
+        dark
+        x-small
         color="amber"
         @click="goToEditPage(item.id)"
       >
         <v-icon dark> mdi-pencil </v-icon>
       </v-btn>
       <v-btn
-        class="mx-2"
+        class="mx-0"
         fab
         dark
-        small
+        x-small
         color="red"
         @click="deleteAudio(item.id)"
       >
@@ -81,15 +91,20 @@ export default {
     goToEditPage(id) {
       this.$router.push({ path: '/admin/audio/edit', query: { audioId: id } })
     },
+    goToDetailPage(slug) {
+      window.open(`/audio/${slug}`, '_blank')
+    },
     async deleteAudio(id) {
       try {
-        await Audios.deleteAudio(id)
-        layoutNamespaceHelpers.$dispatch('setSnackbar', {
-          showing: true,
-          text: 'Xóa audio thành công',
-          color: 'success',
+        if (confirm('Bạn có chắc chắn muốn xóa audio này không?')) {
+          await Audios.deleteAudio(id)
+          layoutNamespaceHelpers.$dispatch('setSnackbar', {
+            showing: true,
+            text: 'Xóa audio thành công',
+            color: 'success',
         })
         await $dispatch('getAudios')
+        }
       } catch (error) {
         layoutNamespaceHelpers.$dispatch('setSnackbar', {
           showing: true,
