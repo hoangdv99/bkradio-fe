@@ -15,6 +15,8 @@
           </p>
           <p class="text-left mb-0">Giọng đọc: {{ item.voice }}</p>
           <p class="text-left mb-0">Tác giả: {{ item.author }}</p>
+          <p v-if="!item.updatedAt" class="text-left mb-0">Ngày đăng tải: {{ new Date(item.createdAt).toLocaleDateString() }}</p>
+          <p v-else class="text-left mb-0">Ngày cập nhật: {{ new Date(item.updatedAt).toLocaleDateString() }}</p>
           <p class="text-left mb-0 summary">
             {{ item.description || 'Thêm mô tả' }}
           </p>
