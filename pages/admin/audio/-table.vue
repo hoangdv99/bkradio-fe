@@ -3,8 +3,8 @@
     <template #[`item.audioDescription`]="{ item }">
       <div class="d-flex align-center pt-1 pb-1 audio-info">
         <img
-          width="120"
-          height="80"
+          width="160"
+          height="120"
           :src="item.thumbnailUrl || require('@/assets/images/no-photo.png')"
           class="mr-2 thumbnail"
         />
@@ -110,6 +110,7 @@ const headers = [
     value: 'status',
     width: 120,
     align: 'center',
+    sortable: false
   },
   {
     text: 'Lượt xem',
@@ -131,6 +132,7 @@ const headers = [
     value: 'actions',
     width: 150,
     align: 'center',
+    sortable: false
   },
 ]
 </script>

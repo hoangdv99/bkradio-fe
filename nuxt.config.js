@@ -80,7 +80,8 @@ export default {
           user: { url: "/auth/me", method: "get" }
         }
       }
-    }
+    },
+    plugins: ['~/apis.js']
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

@@ -78,10 +78,8 @@ export default {
     }
   }
   > .layout > .main {
-    display: flex;
     margin-top: 15px;
     padding: 0 30px;
-    min-height: 80vh;
   }
   > .layout > .main > .content {
     flex: 8;

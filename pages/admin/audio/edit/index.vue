@@ -25,7 +25,7 @@
     </div>
     <div class="edit-page-content d-flex">
       <v-col cols="8" class="content mr-3">
-        <v-col full-width>
+        <v-col>
           <v-text-field
             v-model="audio.title"
             label="Tiêu đề* (Bắt buộc)"
@@ -34,13 +34,14 @@
             required
           ></v-text-field>
         </v-col>
-        <v-col full-width class="pt-0">
+        <v-col class="pt-0">
           <v-textarea
             v-model="audio.description"
             outlined
             name="input-7-4"
             label="Mô tả"
             counter="5000"
+            no-resize
           ></v-textarea>
         </v-col>
         <div>
@@ -59,19 +60,14 @@
             required
           ></v-autocomplete>
         </div>
-        <v-col cols="6" class="d-flex flex-row justify-start pt-0 pb-0">
-          <v-autocomplete
-            v-model="audio.authorId"
-            :items="authors"
-            class="d-flex"
+        <v-col>
+          <v-text-field
+            v-model="audio.author"
             label="Tác giả"
-            item-text="name"
-            item-value="id"
-            dense
             outlined
+            counter="200"
             required
-          ></v-autocomplete>
-          <new-author-popup class="mt-0"></new-author-popup>
+          ></v-text-field>
         </v-col>
         <v-col cols="6" class="d-flex flex-row justify-start pt-0">
           <v-autocomplete
@@ -152,7 +148,7 @@ export default {
       audio: {
         title: null,
         description: null,
-        authorId: null,
+        author: null,
         voiceId: null,
         thumbnailUrl: null,
         url: null,
@@ -174,19 +170,16 @@ export default {
     }
   },
   computed: {
-    authors: $get('authors'),
     voices: $get('voices'),
     formIsValid() {
       return (
         !this.isUploading &&
         this.audio.title &&
-        this.audio.authorId &&
         this.audio.voiceId
       )
     },
   },
   async mounted() {
-    if (!this.authors.length) await $dispatch('getAuthors')
     if (!this.voices.length) await $dispatch('getVoices')
     this.audio = await Audios.getAudio(this.$route.query.audioId)
     this.topics = await Audios.getTopics()
@@ -198,7 +191,7 @@ export default {
           id: this.audio.id,
           title: this.audio.title,
           description: this.audio.description,
-          authorId: this.audio.authorId,
+          author: this.audio.author,
           voiceId: this.audio.voiceId,
           thumbnailUrl: this.audio.thumbnailUrl,
           topicIds: this.audio.topicIds,

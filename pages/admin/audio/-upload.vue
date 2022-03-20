@@ -82,21 +82,16 @@
                   required
                 ></v-autocomplete>
               </div>
-              <div class="d-flex flex-row justify-start">
-                <v-autocomplete
-                  v-model="audio.authorId"
-                  :items="authors"
+              <v-col full-width>
+                <v-text-field
+                  v-model="audio.author"
                   :rules="rules.author"
-                  class="d-flex pt-0 ml-3"
                   label="Tác giả"
-                  item-text="name"
-                  item-value="id"
-                  dense
                   outlined
+                  counter="200"
                   required
-                ></v-autocomplete>
-                <new-author-popup class="mt-0"></new-author-popup>
-              </div>
+                ></v-text-field>
+              </v-col>
               <div class="d-flex flex-row justify-start">
                 <v-autocomplete
                   v-model="audio.voiceId"
@@ -125,11 +120,9 @@
                 "
               >
                 <v-img
-                  :lazy-src="
-                    audio.thumbnailUrl || require('@/assets/images/no-photo.png')
-                  "
-                  max-height="150"
-                  max-width="250"
+                  :lazy-src="require('@/assets/images/no-photo.png')"
+                  :src="audio.thumbnailUrl || require('@/assets/images/no-photo.png')"
+                  width="100%"
                   class="mb-2"
                 ></v-img>
                 <v-btn
@@ -159,12 +152,7 @@
           </div>
         </v-card-text>
         <v-card-actions>
-          <v-btn
-            color="error"
-            text
-            :disabled="isUploading"
-            @click="close"
-          >
+          <v-btn color="error" text :disabled="isUploading" @click="close">
             Đóng
           </v-btn>
           <v-spacer></v-spacer>
@@ -177,7 +165,6 @@
   </div>
 </template>
 <script>
-import NewAuthorPopup from './-@newAuthorPopup.vue'
 import NewVoicePopup from './-@newVoicePopup.vue'
 import { createNamespacedHelpers } from '~/util'
 import Audios from '@/models/audios'
@@ -186,7 +173,6 @@ const { $get, $dispatch } = createNamespacedHelpers('audios')
 export default {
   name: 'UploadButton',
   components: {
-    NewAuthorPopup,
     NewVoicePopup,
   },
   data() {
@@ -199,34 +185,32 @@ export default {
         title: [(value) => !!value || 'Tiêu đề không được bỏ trống'],
         author: [(value) => !!value || 'Tác giả không được bỏ trống'],
         voice: [(value) => !!value || 'Giọng đọc không được bỏ trống'],
-        topic: [(value) => !!value || 'Thể loại không được bỏ trống']
+        topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
       },
       audio: {
         title: null,
         description: null,
-        authorId: null,
+        author: null,
         voiceId: null,
         thumbnailUrl: null,
         audioUrl: null,
-        topicIds: []
+        topicIds: [],
       },
       thumbnail: null,
     }
   },
   computed: {
-    authors: $get('authors'),
     voices: $get('voices'),
     formIsValid() {
       return (
         !this.isUploading &&
         this.audio.title &&
-        this.audio.authorId &&
+        this.audio.author &&
         this.audio.voiceId
       )
     },
   },
   async mounted() {
-    if (!this.authors.length) $dispatch('getAuthors')
     if (!this.voices.length) $dispatch('getVoices')
     this.topics = await Audios.getTopics()
   },
@@ -255,21 +239,22 @@ export default {
       await Audios.uploadToS3(signedUrl, this.selectedFile)
       this.isUploading = false
     },
-    onThumbnailChanged(e) {
+    async onThumbnailChanged(e) {
       this.thumbnail = e.target.files[0]
       this.audio.thumbnailUrl = URL.createObjectURL(this.thumbnail)
+      await this.uploadThumbnail()
     },
     async save() {
       if (this.thumbnail) await this.uploadThumbnail()
       $dispatch('createNewAudio', {
         ...this.audio,
-        userId: this.$auth.user.userId
-      }) 
+        userId: this.$auth.user.userId,
+      })
       $dispatch('getAudios')
       this.audio = {
         title: null,
         description: null,
-        authorId: null,
+        author: null,
         voiceId: null,
         thumbnailUrl: null,
         audioUrl: null,
@@ -280,7 +265,7 @@ export default {
       this.audio = {
         title: null,
         description: null,
-        authorId: null,
+        author: null,
         voiceId: null,
         thumbnailUrl: null,
         audioUrl: null,
@@ -294,11 +279,11 @@ export default {
     async uploadThumbnail() {
       const { signedUrl, fileUrl } = await Audios.getS3PresignedUrl({
         fileName: this.generateUniqueFileName(this.thumbnail.name),
-        fileType: 'image'
+        fileType: 'image',
       })
       this.audio.thumbnailUrl = fileUrl
       await Audios.uploadToS3(signedUrl, this.thumbnail)
-    }
+    },
   },
 }
 </script>

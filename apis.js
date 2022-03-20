@@ -3,20 +3,31 @@ import ky from 'ky-universal'
 export const apis = {}
 export const tasks = []
 
-function createAPI(baseURL) {
+function createAPI({ $auth, redirect, $config }) {
   return ky.create({
-    prefixUrl: baseURL,
+    prefixUrl: $config.API_BASE_URL,
     timeout: 30000,
     credentials: 'include',
     hooks: {
       beforeRequest: [
         req => {
-          tasks.push(1)
+          req.headers.set('x-access-token', `${$auth.strategy.token.get() || ''}`)
         }
       ],
       afterResponse: [
-        (req, options, res) => {
-          tasks.pop()
+        async (req, options, res) => {
+          if (res.status === 401) {
+            await $auth.logout()
+            redirect('/auth/login')
+          }
+          if (!res.ok) {
+            const body = await res.json()
+            const error = {
+              message: body.message || body || '',
+              statusCode: res.status
+            }
+            throw error
+          }
         }
       ]
     }
@@ -31,8 +42,8 @@ export async function loading(promise) {
   return returnValue
 }
 
-export default function ({ $config }) {
+export default function (context) {
   if (process.client) {
-    apis.audioApi = createAPI($config.API_BASE_URL)
+    apis.audioApi = createAPI(context)
   }
 }

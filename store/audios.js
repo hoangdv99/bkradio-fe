@@ -1,5 +1,4 @@
 import { make } from 'vuex-pathify'
-import Authors from '@/models/authors'
 import Voices from '@/models/voices'
 import Audios from '@/models/audios'
 import { createNamespacedHelpers } from '~/util'
@@ -22,15 +21,9 @@ export const mutations = {
   ADD_VOICE(state, voice) {
     state.voices.push(voice)
   },
-  ADD_AUTHOR(state, author) {
-    state.authors.push(author)
-  },
   SET_VOICES(state, voices) {
     state.voices = voices
   },
-  SET_AUTHORS(state, authors) {
-    state.authors = authors
-  }
 }
 
 export const actions = {
@@ -54,27 +47,6 @@ export const actions = {
   async getAudios({ commit }) {
     const audios = await Audios.getAudios()
     commit('SET_AUDIOS', audios)
-  },
-  async getAuthors({ commit }) {
-    const authors = await Authors.getAuthors()
-    commit('SET_AUTHORS', authors)
-  },
-  async createNewAuthor({ commit }, author) {
-    try {
-      await Authors.create(author)
-      commit('ADD_AUTHOR', author)
-      $dispatch('setSnackbar', {
-        showing: true,
-        text: 'Thêm mới tác giả thành công',
-        color: 'success'
-      })
-    } catch (error) {
-      $dispatch('setSnackbar', {
-        showing: true,
-        text: error.response.status === 409 ? 'Tác giả đã tồn tại' : 'Có lỗi xảy ra',
-        color: 'error'
-      })
-    }
   },
   async getVoices({ commit }) {
     const voices = await Voices.getVoices()
