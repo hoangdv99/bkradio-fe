@@ -34,11 +34,24 @@ export default class Audios {
     return await apis.audioApi.get(`audios/${id}`).json()
   }
 
+  static async getAudioBySlug(slug) {
+    return await apis.audioApi.get(`audios/${slug}`).json()
+  }
+
   static async updateAudio(audio) {
     return await apis.audioApi.put(`audios/${audio.id}`, { json: audio })
   }
 
   static async deleteAudio(id) {
     return await apis.audioApi.delete(`audios/${id}`)
+  }
+
+  static async updateRating(audioId, userId, rating) {
+    console.log(audioId, userId, rating)
+    return await apis.audioApi.patch(`audios/${audioId}`, { json: {
+      audioId,
+      userId,
+      rating
+    }})
   }
 }

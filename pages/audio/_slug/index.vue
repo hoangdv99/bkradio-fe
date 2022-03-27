@@ -1,166 +1,158 @@
 <template>
   <div class="detail-page">
-    <div class="post-detail">
-      <div class="header">
-        <h1 class="title">
-          Bỉ Ngạn Hoa | Biên Niên Cô Đơn | Nguyễn Ngọc Thạch
-        </h1>
-        <h2 class="subtitle">Giọng Đọc : Trần Ngọc San</h2>
-        <div class="statistic">
-          <div class="comment">
-            <font-awesome-icon :icon="commentIcon"></font-awesome-icon>
-            <span>0</span>
-          </div>
-          <div class="view">
-            <font-awesome-icon :icon="viewIcon"></font-awesome-icon>
-            <span>1000</span>
+    <v-skeleton-loader
+      v-if="!audio"
+      type="heading, card-heading, card, text@5, actions"
+    ></v-skeleton-loader>
+    <div v-else>
+      <div class="post-detail">
+        <div class="header">
+          <h1 class="title">
+            {{ audio.title + ' | ' + audio.author }}
+          </h1>
+          <h2 class="subtitle">Giọng Đọc : {{ audio.voice }}</h2>
+          <div class="statistic">
+            <div class="comment">
+              <font-awesome-icon :icon="commentIcon"></font-awesome-icon>
+              <span>0</span>
+            </div>
+            <div class="view">
+              <font-awesome-icon :icon="viewIcon"></font-awesome-icon>
+              <span>{{ audio.views }}</span>
+            </div>
           </div>
         </div>
+        <div class="featured">
+          <img :src="audio.thumbnailUrl" alt="image" class="image" />
+          <vue-plyr>
+            <audio controls crossorigin playsinline :src="audio.url"></audio>
+          </vue-plyr>
+        </div>
+        <div class="description">{{ audio.description }}</div>
+        <p class="notice">
+          Các bạn nếu không nghe được audio, vui lòng gửi thông báo ở phần bình
+          luận bên dưới. Ad sẽ chỉnh sửa trong thời gian sớm nhất, thanks các
+          bạn nhiều nhiều !
+        </p>
+        <div class="rating">
+          <star-rating
+            v-model="audio.rating"
+            :increment="1"
+            :star-size="30"
+            :show-rating="false"
+            :read-only="!$auth.loggedIn"
+            active-on-click
+            class="stars"
+            @rating-selected="updateRating"
+          />
+          <p class="text">10 bình chọn</p>
+        </div>
+        <div v-if="!$auth.loggedIn" class="alert">
+          Bạn cần <nuxt-link to="/auth/login">đăng nhập</nuxt-link> để bình chọn
+        </div>
+        <div class="tags">
+          <a
+            v-for="(topic, index) in audio.topics"
+            :key="index"
+            href="#"
+            class="tag"
+            >#{{ topic }}</a
+          >
+          <a href="#" class="tag">#Hem radio</a>
+        </div>
       </div>
-      <div class="featured">
-        <img
-          src="https://i0.wp.com/hemradio.com/wp-content/uploads/2021/10/bi-ngan-hoa-bien-nien-co-don-nguyen-ngoc-thach.gif?resize=780%2C470&ssl=1"
-          alt="image"
-          class="image"
-        />
-        <vue-plyr>
-          <audio controls crossorigin playsinline>
-            <source
-              src="https://archive.org/download/y-2mate.com-bi-nga-n-hoa-bie-n-nie-n-co-do-n-tac-gia-nguyen-ngoc-thach-giong-doc/y2mate.com%20-%20B%E1%BB%88%20NG%E1%BA%A0N%20HOA%20%20BI%C3%8AN%20NI%C3%8AN%20C%C3%94%20%C4%90%C6%A0N%20%20T%C3%A1c%20gi%E1%BA%A3%20Nguy%E1%BB%85n%20Ng%E1%BB%8Dc%20Th%E1%BA%A1ch%20%20Gi%E1%BB%8Dng%20%C4%91%E1%BB%8Dc%20Tr%E1%BA%A7n%20Ng%E1%BB%8Dc%20San%20%20PH%E1%BB%90%20RADIO.mp3?_=1"
-              type="audio/mp3"
+      <div class="related-posts">
+        <h3 class="title">Có thể bạn quan tâm...</h3>
+        <ul class="list">
+          <a href="" class="post">
+            <img
+              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+              alt="post"
+              class="thumbnail"
             />
-          </audio>
-        </vue-plyr>
+            Đồng Hào Có Ma | Nguyễn Công Hoan
+          </a>
+          <a href="" class="post">
+            <img
+              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+              alt="post"
+              class="thumbnail"
+            />
+            Đồng Hào Có Ma | Nguyễn Công Hoan
+          </a>
+          <a href="" class="post">
+            <img
+              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+              alt="post"
+              class="thumbnail"
+            />
+            Đồng Hào Có Ma | Nguyễn Công Hoan
+          </a>
+          <a href="" class="post">
+            <img
+              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+              alt="post"
+              class="thumbnail"
+            />
+            Đồng Hào Có Ma | Nguyễn Công Hoan
+          </a>
+          <a href="" class="post">
+            <img
+              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+              alt="post"
+              class="thumbnail"
+            />
+            Đồng Hào Có Ma | Nguyễn Công Hoan
+          </a>
+          <a href="" class="post">
+            <img
+              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+              alt="post"
+              class="thumbnail"
+            />
+            Đồng Hào Có Ma | Nguyễn Công Hoan
+          </a>
+        </ul>
       </div>
-      <div class="description">
-        Link mua sách BIÊN NIÊN CÔ ĐƠN và các tác phẩm đặc sắc khác của nhà văn
-        Nguyễn Ngọc Thạch: Shopee: https://shp.ee/kpe6w66 Tiki:
-        https://bit.ly/3A4Rogw Trong video có sử dụng các Lyrics Music Video là
-        sáng tác và sự thể hiện của Ca nhạc sĩ Duy Khiêm Ngố: – Thất Tình Chẳng
-        Sao. – Ngàn Năm. – Ngồi Ngắm Hoa Tàn. – Biên Niên Cô Đơn. Phố Radio xin
-        tri ân nhà văn Nguyễn Ngọc Thạch và Ca nhạc sĩ Duy Khiêm Ngố đã đồng ý
-        cho Phố Radio sử dụng những nguồn tư liệu quý giá này. Mong quý vị khán
-        thính giả gần xa tiếp tục ủng hộ hai nghệ sĩ trẻ này. Để nghe thêm các
-        tác phẩm truyện audio khác được thực hiện bởi Phố Radio cùng nhiều giọng
-        đọc hay, hãy tìm thêm trên kênh Phố Radio. Rất mong, Phố Radio sẽ là địa
-        chỉ nghe radio, nghe đọc truyện online, đọc truyện ngắn, nghe đọc truyện
-        đêm khuya quen thuộc với quý khán thính giả gần xa. 📌Liên hệ với Phố
-        Radio: Facebook: https://www.facebook.com/PhoRadioOffi… Email:
-        Phoradiovn@gmail.com Mọi đóng góp, giúp đỡ cho Phố Radio, xin gửi về:
-        PayPal: tranngocsan2007@gmail.com Techcombank: 19027463618018 – Tran
-        Ngoc San – Chi Nhánh Quận 03, TP.HCM. Momo: 0933100192 – Tran Ngoc San.
-        Xin chân thành cảm ơn.
-      </div>
-      <p class="notice">
-        Các bạn nếu không nghe được audio, vui lòng gửi thông báo ở phần bình
-        luận bên dưới. Ad sẽ chỉnh sửa trong thời gian sớm nhất, thanks các bạn
-        nhiều nhiều !
-      </p>
-      <div class="rating">
-        <star-rating
-          :increment=0.5
-          :star-size=30
-          :show-rating=false
-          class="stars"
-        />
-        <p class="text">10 bình chọn</p>
-      </div>
-      <div class="tags">
-        <a href="#" class="tag">#Hem radio</a>
-        <a href="#" class="tag">#Hem radio</a>
-        <a href="#" class="tag">#Hem radio</a>
-        <a href="#" class="tag">#Hem radio</a>
-        <a href="#" class="tag">#Hem radio</a>
-        <a href="#" class="tag">#Hem radio</a>
-        <a href="#" class="tag">#Hem radio</a>
-      </div>
+      <comment-block></comment-block>
     </div>
-    <div class="related-posts">
-      <h3 class="title">Có thể bạn quan tâm...</h3>
-      <ul class="list">
-        <a href="" class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-            alt="post"
-            class="thumbnail"
-          />
-          Đồng Hào Có Ma | Nguyễn Công Hoan
-        </a>
-        <a href="" class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-            alt="post"
-            class="thumbnail"
-          />
-          Đồng Hào Có Ma | Nguyễn Công Hoan
-        </a>
-        <a href="" class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-            alt="post"
-            class="thumbnail"
-          />
-          Đồng Hào Có Ma | Nguyễn Công Hoan
-        </a>
-        <a href="" class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-            alt="post"
-            class="thumbnail"
-          />
-          Đồng Hào Có Ma | Nguyễn Công Hoan
-        </a>
-        <a href="" class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-            alt="post"
-            class="thumbnail"
-          />
-          Đồng Hào Có Ma | Nguyễn Công Hoan
-        </a>
-        <a href="" class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-            alt="post"
-            class="thumbnail"
-          />
-          Đồng Hào Có Ma | Nguyễn Công Hoan
-        </a>
-      </ul>
-    </div>
-    <comment-block></comment-block>
   </div>
 </template>
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faComments, faEye } from '@fortawesome/free-solid-svg-icons'
 import CommentBlock from './-comment.vue'
+import Audios from '@/models/audios'
 export default {
   layoutContent() {
     return {
       showSidebar: true,
-      breadcrumbs: [
-        {
-          name: 'Truyện ngắn',
-          url: '#',
-        },
-        {
-          name: 'Phận đàn bà | Y mùi',
-          url: '#',
-        },
-      ],
     }
   },
   name: 'DetailPage',
   components: {
     FontAwesomeIcon,
-    CommentBlock
+    CommentBlock,
   },
   data() {
     return {
       commentIcon: faComments,
       viewIcon: faEye,
+      audio: null,
     }
+  },
+  async mounted() {
+    this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+  },
+  methods: {
+    async updateRating() {
+      await Audios.updateRating(
+        this.audio.id,
+        this.$auth.user.userId,
+        this.audio.rating
+      )
+      // this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+    },
   },
 }
 </script>
@@ -173,7 +165,7 @@ export default {
     padding: 30px 30px 20px;
   }
   > .header > .title {
-    font-size: 30px;
+    font-size: 30px !important;
     text-transform: capitalize;
     margin-bottom: 15px;
     line-height: 1.4;
@@ -226,7 +218,12 @@ export default {
   }
   > .rating > .text {
     margin-left: 10px;
+    margin-bottom: 0;
     font-size: 15px;
+  }
+  > .alert {
+    padding: 0 30px 20px;
+    text-align: right;
   }
   > .notice {
     padding: 0 30px 20px;
