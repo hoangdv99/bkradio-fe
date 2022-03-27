@@ -1,26 +1,22 @@
 <template>
   <header class="app-header">
-    <img src="/hemradio.png" alt="logo" class="logo" />
+    <nuxt-link to="/" class="logo">
+      <img src="/hemradio.png" alt="logo" />
+    </nuxt-link>
     <ul class="menu">
       <li class="item -active">
-        <a href="" class="link">Home</a>
-      </li>
-      <li class="item">
-        <a href="" class="link -dropdown">Truyện</a>
-        <ul class="sub-menu">
-          <a href="" class="item">Truyện ngắn</a>
-          <a href="" class="item">Truyện dài</a>
-        </ul>
-      </li>
-      <li class="item">
-        <a href="" class="link">Sách nói</a>
+        <a href="" class="link">Trang chủ</a>
       </li>
       <li class="item">
         <a href="" class="link -dropdown">Thể loại</a>
         <ul class="sub-menu">
-          <a href="" class="item">Tình yêu</a>
-          <a href="" class="item">Kỹ năng sống</a>
-          <a href="" class="item">Văn học học đường</a>
+          <a
+            v-for="topic in topics"
+            :key="topic.id"
+            :href="'/topic/' + topic.slug"
+            class="item"
+            >{{ topic.title }}</a
+          >
         </ul>
       </li>
       <li class="item">
@@ -55,6 +51,7 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import Audios from '@/models/audios'
 export default {
   name: 'AppHeader',
   components: {
@@ -63,18 +60,22 @@ export default {
   data() {
     return {
       searchIcon: faSearch,
+      topics: [],
     }
   },
   computed: {
     isAuthenticated() {
       return this.$store.getters.isAuthenticated
-    }
+    },
+  },
+  async mounted() {
+    this.topics = await Audios.getTopics()
   },
   methods: {
     async logout() {
       await this.$auth.logout()
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>

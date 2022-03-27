@@ -1,20 +1,31 @@
 <template>
   <footer class="app-footer">
-    <div class="text">© Copyright 2022 BKRadio | Thư Viện Audio Dành Cho Mọi Người</div>
+    <div class="text">
+      © Copyright 2022 BKRadio | Thư Viện Audio Dành Cho Mọi Người
+    </div>
     <ul class="menu">
-      <a href="#" class="item">Tình yêu</a>
-      <a href="#" class="item">Tình yêu</a>
-      <a href="#" class="item">Tình yêu</a>
-      <a href="#" class="item">Tình yêu</a>
-      <a href="#" class="item">Tình yêu</a>
-      <a href="#" class="item">Tình yêu</a>
-      <a href="#" class="item">Tình yêu</a>
+      <nuxt-link
+        v-for="topic in topics"
+        :key="topic.id"
+        :to="'/topic/' + topic.slug"
+        class="item"
+        >{{ topic.title }}</nuxt-link
+      >
     </ul>
   </footer>
 </template>
 <script>
+import Audios from '@/models/audios'
 export default {
-  name: "AppFooter",
+  name: 'AppFooter',
+  data() {
+    return {
+      topics: [],
+    }
+  },
+  async mounted() {
+    this.topics = await Audios.getTopics()
+  },
 }
 </script>
 <style lang="scss" scoped>
