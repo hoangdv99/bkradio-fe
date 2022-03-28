@@ -10,20 +10,38 @@
       <li class="item">
         <a href="" class="link -dropdown">Thể loại</a>
         <ul class="sub-menu">
-          <a
-            v-for="topic in topics"
-            :key="topic.id"
-            :href="'/topic/' + topic.slug"
-            class="item"
-            >{{ topic.title }}</a
-          >
+          <li class="list">
+            <a
+              v-for="topic in topics"
+              :key="topic.id"
+              :href="'/topic/' + topic.slug"
+              class="item"
+              >{{ topic.title }}</a
+            >
+          </li>
         </ul>
       </li>
       <li class="item">
         <a href="" class="link -dropdown">Giọng đọc</a>
-        <ul class="sub-menu">
-          <a href="" class="item">Trần Ngọc San</a>
-          <a href="" class="item">Kẻ Trộm Hương</a>
+        <ul class="sub-menu -voices">
+          <li class="list">
+            <nuxt-link
+              v-for="voice in maleVoices"
+              :key="voice.id"
+              :to="'/voice/' + voice.slug"
+              class="item"
+              >{{ voice.name }}</nuxt-link
+            >
+          </li>
+          <li class="list">
+            <nuxt-link
+              v-for="voice in femaleVoices"
+              :key="voice.id"
+              :to="'/voice/' + voice.slug"
+              class="item"
+              >{{ voice.name }}</nuxt-link
+            >
+          </li>
         </ul>
       </li>
       <li class="item">
@@ -41,8 +59,10 @@
         class="avatar"
       />
       <ul class="sub-menu">
-        <NuxtLink to="/admin/audio" class="item">Quản lý audio</NuxtLink>
-        <div class="item" @click="logout">Đăng xuất</div>
+        <li class="list">
+          <nuxt-link to="/admin/audio" class="item">Quản lý audio</nuxt-link>
+          <div class="item" @click="logout">Đăng xuất</div>
+        </li>
       </ul>
     </div>
     <NuxtLink v-else to="/auth/login" class="auth">Đăng nhập</NuxtLink>
@@ -52,6 +72,7 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import Audios from '@/models/audios'
+import Voices from '@/models/voices'
 export default {
   name: 'AppHeader',
   components: {
@@ -61,6 +82,8 @@ export default {
     return {
       searchIcon: faSearch,
       topics: [],
+      maleVoices: [],
+      femaleVoices: [],
     }
   },
   computed: {
@@ -70,6 +93,9 @@ export default {
   },
   async mounted() {
     this.topics = await Audios.getTopics()
+    const totalVoices = await Voices.getVoices()
+    this.maleVoices = totalVoices.filter(voice => voice.gender === 1)
+    this.femaleVoices = totalVoices.filter(voice => voice.gender === 2)
   },
   methods: {
     async logout() {
@@ -101,6 +127,10 @@ export default {
     }
     &:hover > .sub-menu {
       display: block;
+      &.-voices {
+        display: flex;
+        width: 300px;
+      }
     }
     &.-active {
       background-color: #9ebaa0;
@@ -217,7 +247,7 @@ export default {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 1;
-  > .item + .sub-menu {
+  > .list > .item + .sub-menu {
     &:hover {
       display: block;
       top: 20px;
@@ -225,7 +255,7 @@ export default {
       border-top: none;
     }
   }
-  > .item {
+  > .list > .item {
     display: block;
     font-weight: 400;
     text-transform: uppercase;
