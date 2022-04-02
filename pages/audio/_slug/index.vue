@@ -143,6 +143,7 @@ export default {
   },
   async mounted() {
     this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+    await Audios.updateView(this.audio.id, this.$auth.user.userId)
   },
   methods: {
     async updateRating() {

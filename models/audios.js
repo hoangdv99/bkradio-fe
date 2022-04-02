@@ -51,11 +51,17 @@ export default class Audios {
   }
 
   static async updateRating(audioId, userId, rating) {
-    console.log(audioId, userId, rating)
     return await apis.audioApi.patch(`audios/${audioId}`, { json: {
       audioId,
       userId,
       rating
+    }})
+  }
+
+  static async updateView(audioId, userId) {
+    return await apis.audioApi.patch(`audios/${audioId}/view`, { json: {
+      audioId,
+      userId
     }})
   }
 }
