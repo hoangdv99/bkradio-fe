@@ -4,8 +4,9 @@
       v-if="!audio"
       type="heading, card-heading, card, text@5, actions"
     ></v-skeleton-loader>
-    <div v-else>
-      <div class="post-detail">
+    <div v-else class="container">
+      <div class="content">
+        <div class="post-detail">
         <div class="header">
           <h1 class="title">
             {{ audio.title + ' | ' + audio.author }}
@@ -115,6 +116,8 @@
         </ul>
       </div>
       <comment-block></comment-block>
+      </div>
+      <common-sidebar />
     </div>
   </div>
 </template>
@@ -158,6 +161,14 @@ export default {
 }
 </script>
 <style lang="scss">
+.detail-page {
+  > .container {
+    display: flex;
+  }
+  > .container > .content {
+    width: 66%;
+  }
+}
 .post-detail {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;

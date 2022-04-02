@@ -80,11 +80,6 @@ import 'vue-slick-carousel/dist/vue-slick-carousel.css'
 import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
 import Audios from '~/models/audios'
 export default {
-  layoutContent() {
-    return {
-      showSidebar: true,
-    }
-  },
   name: 'IndexPage',
   components: {
     VueSlickCarousel,
