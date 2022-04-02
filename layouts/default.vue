@@ -6,7 +6,6 @@
         <layout-breadcrumbs></layout-breadcrumbs>
         <main class="main">
           <nuxt class="content"></nuxt>
-          <common-sidebar v-if="showSidebar"></common-sidebar>
         </main>
         <layout-footer></layout-footer>
       </div>
@@ -45,7 +44,6 @@ export default {
     }
   },
   computed: {
-    showSidebar: $get('showSidebar'),
     snackbar: $get('snackbar'),
   },
   mounted() {
@@ -78,12 +76,8 @@ export default {
     }
   }
   > .layout > .main {
-    display: flex;
-    margin-top: 15px;
+    margin-top: 30px;
     padding: 0 30px;
-  }
-  > .layout > .main > .content {
-    flex: 8;
   }
   > .pagetop {
     width: 35px;

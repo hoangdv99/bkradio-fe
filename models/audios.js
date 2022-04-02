@@ -18,6 +18,10 @@ export default class Audios {
     })
   }
 
+  static async getHomeAudios() {
+    return await apis.audioApi.get('home').json()
+  }
+
   static async create(audio) {
     return await apis.audioApi.post('audios', { json: audio })
   }
