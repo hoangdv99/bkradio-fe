@@ -51,17 +51,25 @@ export default class Audios {
   }
 
   static async updateRating(audioId, userId, rating) {
-    return await apis.audioApi.patch(`audios/${audioId}`, { json: {
-      audioId,
-      userId,
-      rating
-    }})
+    return await apis.audioApi.patch(`audios/${audioId}`, {
+      json: {
+        audioId,
+        userId,
+        rating
+      }
+    })
   }
 
   static async updateView(audioId, userId) {
-    return await apis.audioApi.patch(`audios/${audioId}/view`, { json: {
-      audioId,
-      userId
-    }})
+    return await apis.audioApi.patch(`audios/${audioId}/view`, {
+      json: {
+        audioId,
+        userId
+      }
+    })
+  }
+
+  static async getTrendingAudios(period) {
+    return await apis.audioApi.get(`audios/trending?period=${period}`).json()
   }
 }

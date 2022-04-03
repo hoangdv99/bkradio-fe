@@ -19,62 +19,17 @@
         <font-awesome-icon :icon="bookIcon" class="icon"></font-awesome-icon>
         Nghe nhiều nhất
       </div>
+      <v-tabs color="blue-grey" class="mt-2 mb-2">
+        <v-tab @click="getTrendingAudios('all')">Tất cả</v-tab>
+        <v-tab @click="getTrendingAudios('all')">Tuần</v-tab>
+        <v-tab @click="getTrendingAudios('all')">Tháng</v-tab>
+      </v-tabs>
       <ul class="posts">
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
-        </li>
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
-        </li>
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
-        </li>
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
-        </li>
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
-        </li>
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
-        </li>
-        <li class="post">
-          <img
-            src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/muon-kiep-nhan-sinh-nguyen-phong.gif?resize=220%2C150&ssl=1"
-            alt="thumbnail"
-            class="thumbnail"
-          />
-          <a href="" class="title">Muôn Kiếp Nhân Sinh | Nguyên Phong</a>
+        <li v-for="audio in trendingAudios" :key="audio.id" class="post" @click="goToDetailPage(audio)">
+          <img :src="audio.thumbnailUrl" alt="thumbnail" class="thumbnail" />
+          <p :to="`/audio/${audio.slug}`" class="title">
+            {{ audio.title }} | {{ audio.author }}
+          </p>
         </li>
       </ul>
     </div>
@@ -83,6 +38,7 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faThumbtack, faBook } from '@fortawesome/free-solid-svg-icons'
+import Audios from '~/models/audios'
 
 export default {
   name: 'AppSidebar',
@@ -93,6 +49,19 @@ export default {
     return {
       thumbtackIcon: faThumbtack,
       bookIcon: faBook,
+      trendingAudios: [],
+    }
+  },
+  async mounted() {
+    await this.getTrendingAudios('all')
+  },
+  methods: {
+    async getTrendingAudios(period) {
+      const audios = await Audios.getTrendingAudios(period)
+      this.trendingAudios = audios
+    },
+    goToDetailPage(audio) {
+      this.$router.push(`/audio/${audio.slug}`)
     }
   },
 }
@@ -103,12 +72,12 @@ export default {
   overflow: visible;
   width: 33.33333%;
   padding: 0 15px;
+  margin-bottom: 30px;
 }
 .wrapped-content {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   padding: 30px;
-  margin-bottom: 30px;
   > .title {
     display: inline-block;
     position: relative;
@@ -157,6 +126,9 @@ export default {
       color: #627c83;
     }
   }
+  &.-mostviewed > .title {
+    margin-bottom: 0;
+  }
   &.-mostviewed > .posts {
     counter-reset: post-widget-counter;
   }
@@ -165,6 +137,14 @@ export default {
     display: flex;
     padding: 7px 0;
     text-align: start;
+    transition: 0.3s;
+    border-radius: 15px;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.8;
+      transform: translateY(-0.15rem);
+      box-shadow: 0 4px 7px rgb(0 0 0 / 20%);
+    }
     &:last-child {
       padding-top: 0;
     }
@@ -189,13 +169,14 @@ export default {
     }
   }
   &.-mostviewed > .posts > .post > .thumbnail {
-    width: 110px;
+    width: 120px;
+    height: 80px;
     border-radius: 15px;
     margin-right: 15px;
     cursor: pointer;
   }
   &.-mostviewed > .posts > .post > .title {
-    font-size: 14px;
+    font-size: 14px !important;
     line-height: 1.4;
     color: #333;
     font-weight: 600;
