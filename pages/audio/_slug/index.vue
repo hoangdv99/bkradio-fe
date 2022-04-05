@@ -124,6 +124,35 @@
         </div>
         <comment-block></comment-block>
       </div>
+      <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="350"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Tiếp tục nghe?
+        </v-card-title>
+        <v-card-text>Lần trước bạn đã nghe đến {{ convertTime(audio.history) }}</v-card-text>
+        <v-card-actions class="d-flex justify-space-between">
+          <v-btn
+            color="orange darken-1"
+            text
+            class="float-left"
+            @click="listenFromStart"
+          >
+            Nghe từ đầu
+          </v-btn>
+          <v-btn
+            color="primary darken-1"
+            text
+            @click="resumeListening"
+          >
+            Tiếp tục nghe
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
       <common-sidebar />
     </div>
   </div>
@@ -149,14 +178,22 @@ export default {
       commentIcon: faComments,
       viewIcon: faEye,
       audio: null,
+      dialog: false,
     }
   },
   beforeMount() {
     window.addEventListener('beforeunload', this.saveHistory)
   },
   async mounted() {
-    this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+    this.audio = await Audios.getAudioBySlug(this.$auth.user.userId, this.$route.params.slug)
     await Audios.updateView(this.audio.id, this.$auth.user.userId)
+    if (this.audio.history && this.audio.history > 0) {
+      this.dialog = true
+    }
+  },
+  beforeDestroy() {
+    this.saveHistory()
+    window.removeEventListener('beforeunload', this.saveHistory)
   },
   methods: {
     async updateRating() {
@@ -168,7 +205,7 @@ export default {
       // this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
     },
     async saveHistory() {
-      const currentPlayingTime = this.$refs.player.currentTime
+      const currentPlayingTime = this.$refs.player?.currentTime
       if (currentPlayingTime > 0) {
         const audioLength = this.$refs.player.duration
         await Audios.saveHistory(
@@ -179,10 +216,18 @@ export default {
         )
       }
     },
-  },
-  beforeDestroy() {
-    this.saveHistory()
-    window.removeEventListener('beforeunload', this.saveHistory)
+    convertTime(second) {
+      return second ? new Date(second * 1000).toISOString().substr(11, 8) : null
+    },
+    listenFromStart() {
+      this.dialog = false
+      this.$refs.player.play()
+    },
+    resumeListening() {
+      this.dialog = false
+      this.$refs.player.currentTime = this.audio.history
+      this.$refs.player.play()
+    }
   },
 }
 </script>

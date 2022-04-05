@@ -38,8 +38,8 @@ export default class Audios {
     return await apis.audioApi.get(`audios/${id}`).json()
   }
 
-  static async getAudioBySlug(slug) {
-    return await apis.audioApi.get(`audios/${slug}`).json()
+  static async getAudioBySlug(userId, slug) {
+    return await apis.audioApi.get(`audios/${slug}?userId=${userId}`).json()
   }
 
   static async updateAudio(audio) {
