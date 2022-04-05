@@ -72,4 +72,19 @@ export default class Audios {
   static async getTrendingAudios(period) {
     return await apis.audioApi.get(`audios/trending?period=${period}`).json()
   }
+
+  static async saveHistory(audioId, userId, time, audioLength) {
+    return await apis.audioApi.post('history', {
+      json: {
+        audioId,
+        userId,
+        time,
+        audioLength
+      }
+    })
+  }
+
+  static async getLastViewedAudios(userId) {
+    return await apis.audioApi.get(`history?userId=${userId}`).json()
+  }
 }

@@ -6,13 +6,24 @@
           :icon="thumbtackIcon"
           class="icon"
         ></font-awesome-icon>
-        Bạn Vừa Nghe
+        Danh sách tiếp tục nghe
       </div>
-      <ul class="posts">
-        <a href="" class="post">Phận Đàn Bà | Y Mùi</a>
-        <a href="" class="post">Phận Đàn Bà | Y Mùi</a>
-        <a href="" class="post">Phận Đàn Bà | Y Mùi</a>
-      </ul>
+      <div v-if="$auth.loggedIn" class="posts">
+        <nuxt-link
+          v-for="audio in lastViewedAudios"
+          :key="audio.id"
+          :to="`/audio/${audio.slug}`"
+          class="post"
+          >{{ audio.title }} | {{ audio.author
+          }}<span class="ml-4">{{
+            convertTime(audio.currentListeningTime)
+          }}</span></nuxt-link
+        >
+      </div>
+      <p v-else>
+        <nuxt-link to="/auth/login">Đăng nhập</nuxt-link> để sử dụng tính năng
+        này
+      </p>
     </div>
     <div class="wrapped-content -mostviewed">
       <div class="title">
@@ -24,14 +35,19 @@
         <v-tab @click="getTrendingAudios('all')">Tuần</v-tab>
         <v-tab @click="getTrendingAudios('all')">Tháng</v-tab>
       </v-tabs>
-      <ul class="posts">
-        <li v-for="audio in trendingAudios" :key="audio.id" class="post" @click="goToDetailPage(audio)">
+      <div class="posts">
+        <li
+          v-for="audio in trendingAudios"
+          :key="audio.id"
+          class="post"
+          @click="goToDetailPage(audio)"
+        >
           <img :src="audio.thumbnailUrl" alt="thumbnail" class="thumbnail" />
           <p :to="`/audio/${audio.slug}`" class="title">
             {{ audio.title }} | {{ audio.author }}
           </p>
         </li>
-      </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -49,10 +65,16 @@ export default {
     return {
       thumbtackIcon: faThumbtack,
       bookIcon: faBook,
+      lastViewedAudios: [],
       trendingAudios: [],
     }
   },
   async mounted() {
+    if (this.$auth.loggedIn) {
+      this.lastViewedAudios = await Audios.getLastViewedAudios(
+        this.$auth.user.userId
+      )
+    }
     await this.getTrendingAudios('all')
   },
   methods: {
@@ -62,7 +84,10 @@ export default {
     },
     goToDetailPage(audio) {
       this.$router.push(`/audio/${audio.slug}`)
-    }
+    },
+    convertTime(second) {
+      return new Date(second * 1000).toISOString().substr(11, 8)
+    },
   },
 }
 </script>
@@ -72,7 +97,9 @@ export default {
   overflow: visible;
   width: 33.33333%;
   padding: 0 15px;
-  margin-bottom: 30px;
+  > .wrapped-content {
+    margin-bottom: 20px;
+  }
 }
 .wrapped-content {
   border: 1px solid rgba(0, 0, 0, 0.1);

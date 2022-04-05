@@ -7,115 +7,122 @@
     <div v-else class="container">
       <div class="content">
         <div class="post-detail">
-        <div class="header">
-          <h1 class="title">
-            {{ audio.title + ' | ' + audio.author }}
-          </h1>
-          <h2 class="subtitle">Giọng Đọc : {{ audio.voice }}</h2>
-          <div class="statistic">
-            <div class="comment">
-              <font-awesome-icon :icon="commentIcon"></font-awesome-icon>
-              <span>0</span>
-            </div>
-            <div class="view">
-              <font-awesome-icon :icon="viewIcon"></font-awesome-icon>
-              <span>{{ audio.views }}</span>
+          <div class="header">
+            <h1 class="title">
+              {{ audio.title + ' | ' + audio.author }}
+            </h1>
+            <h2 class="subtitle">Giọng Đọc : {{ audio.voice }}</h2>
+            <div class="statistic">
+              <div class="comment">
+                <font-awesome-icon :icon="commentIcon"></font-awesome-icon>
+                <span>0</span>
+              </div>
+              <div class="view">
+                <font-awesome-icon :icon="viewIcon"></font-awesome-icon>
+                <span>{{ audio.views }}</span>
+              </div>
             </div>
           </div>
+          <div class="featured">
+            <img :src="audio.thumbnailUrl" alt="image" class="image" />
+            <vue-plyr>
+              <audio
+                ref="player"
+                controls
+                crossorigin
+                playsinline
+                :src="audio.url"
+              ></audio>
+            </vue-plyr>
+          </div>
+          <div class="description">{{ audio.description }}</div>
+          <p class="notice">
+            Các bạn nếu không nghe được audio, vui lòng gửi thông báo ở phần
+            bình luận bên dưới. Ad sẽ chỉnh sửa trong thời gian sớm nhất, thanks
+            các bạn nhiều nhiều !
+          </p>
+          <div class="rating">
+            <star-rating
+              v-model="audio.rating"
+              :increment="1"
+              :star-size="30"
+              :show-rating="false"
+              :read-only="!$auth.loggedIn"
+              active-on-click
+              class="stars"
+              @rating-selected="updateRating"
+            />
+            <p class="text">10 bình chọn</p>
+          </div>
+          <div v-if="!$auth.loggedIn" class="alert">
+            Bạn cần <nuxt-link to="/auth/login">đăng nhập</nuxt-link> để bình
+            chọn
+          </div>
+          <div class="tags">
+            <a
+              v-for="(topic, index) in audio.topics"
+              :key="index"
+              href="#"
+              class="tag"
+              >#{{ topic }}</a
+            >
+            <a href="#" class="tag">#Hem radio</a>
+          </div>
         </div>
-        <div class="featured">
-          <img :src="audio.thumbnailUrl" alt="image" class="image" />
-          <vue-plyr>
-            <audio controls crossorigin playsinline :src="audio.url"></audio>
-          </vue-plyr>
+        <div class="related-posts">
+          <h3 class="title">Có thể bạn quan tâm...</h3>
+          <ul class="list">
+            <a href="" class="post">
+              <img
+                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+                alt="post"
+                class="thumbnail"
+              />
+              Đồng Hào Có Ma | Nguyễn Công Hoan
+            </a>
+            <a href="" class="post">
+              <img
+                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+                alt="post"
+                class="thumbnail"
+              />
+              Đồng Hào Có Ma | Nguyễn Công Hoan
+            </a>
+            <a href="" class="post">
+              <img
+                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+                alt="post"
+                class="thumbnail"
+              />
+              Đồng Hào Có Ma | Nguyễn Công Hoan
+            </a>
+            <a href="" class="post">
+              <img
+                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+                alt="post"
+                class="thumbnail"
+              />
+              Đồng Hào Có Ma | Nguyễn Công Hoan
+            </a>
+            <a href="" class="post">
+              <img
+                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+                alt="post"
+                class="thumbnail"
+              />
+              Đồng Hào Có Ma | Nguyễn Công Hoan
+            </a>
+            <a href="" class="post">
+              <img
+                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
+                alt="post"
+                class="thumbnail"
+              />
+              Đồng Hào Có Ma | Nguyễn Công Hoan
+            </a>
+          </ul>
         </div>
-        <div class="description">{{ audio.description }}</div>
-        <p class="notice">
-          Các bạn nếu không nghe được audio, vui lòng gửi thông báo ở phần bình
-          luận bên dưới. Ad sẽ chỉnh sửa trong thời gian sớm nhất, thanks các
-          bạn nhiều nhiều !
-        </p>
-        <div class="rating">
-          <star-rating
-            v-model="audio.rating"
-            :increment="1"
-            :star-size="30"
-            :show-rating="false"
-            :read-only="!$auth.loggedIn"
-            active-on-click
-            class="stars"
-            @rating-selected="updateRating"
-          />
-          <p class="text">10 bình chọn</p>
-        </div>
-        <div v-if="!$auth.loggedIn" class="alert">
-          Bạn cần <nuxt-link to="/auth/login">đăng nhập</nuxt-link> để bình chọn
-        </div>
-        <div class="tags">
-          <a
-            v-for="(topic, index) in audio.topics"
-            :key="index"
-            href="#"
-            class="tag"
-            >#{{ topic }}</a
-          >
-          <a href="#" class="tag">#Hem radio</a>
-        </div>
-      </div>
-      <div class="related-posts">
-        <h3 class="title">Có thể bạn quan tâm...</h3>
-        <ul class="list">
-          <a href="" class="post">
-            <img
-              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-              alt="post"
-              class="thumbnail"
-            />
-            Đồng Hào Có Ma | Nguyễn Công Hoan
-          </a>
-          <a href="" class="post">
-            <img
-              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-              alt="post"
-              class="thumbnail"
-            />
-            Đồng Hào Có Ma | Nguyễn Công Hoan
-          </a>
-          <a href="" class="post">
-            <img
-              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-              alt="post"
-              class="thumbnail"
-            />
-            Đồng Hào Có Ma | Nguyễn Công Hoan
-          </a>
-          <a href="" class="post">
-            <img
-              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-              alt="post"
-              class="thumbnail"
-            />
-            Đồng Hào Có Ma | Nguyễn Công Hoan
-          </a>
-          <a href="" class="post">
-            <img
-              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-              alt="post"
-              class="thumbnail"
-            />
-            Đồng Hào Có Ma | Nguyễn Công Hoan
-          </a>
-          <a href="" class="post">
-            <img
-              src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-              alt="post"
-              class="thumbnail"
-            />
-            Đồng Hào Có Ma | Nguyễn Công Hoan
-          </a>
-        </ul>
-      </div>
-      <comment-block></comment-block>
+        <comment-block></comment-block>
       </div>
       <common-sidebar />
     </div>
@@ -144,6 +151,9 @@ export default {
       audio: null,
     }
   },
+  beforeMount() {
+    window.addEventListener('beforeunload', this.saveHistory)
+  },
   async mounted() {
     this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
     await Audios.updateView(this.audio.id, this.$auth.user.userId)
@@ -157,6 +167,22 @@ export default {
       )
       // this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
     },
+    async saveHistory() {
+      const currentPlayingTime = this.$refs.player.currentTime
+      if (currentPlayingTime > 0) {
+        const audioLength = this.$refs.player.duration
+        await Audios.saveHistory(
+          this.audio.id,
+          this.$auth.user.userId,
+          currentPlayingTime,
+          audioLength
+        )
+      }
+    },
+  },
+  beforeDestroy() {
+    this.saveHistory()
+    window.removeEventListener('beforeunload', this.saveHistory)
   },
 }
 </script>
