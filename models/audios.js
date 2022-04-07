@@ -26,8 +26,8 @@ export default class Audios {
     return await apis.audioApi.post('audios', { json: audio })
   }
 
-  static async getAudios() {
-    return await apis.audioApi.get('audios').json()
+  static async getAudios(searchParams) {
+    return await apis.audioApi.get(`audios`, { searchParams }).json()
   }
 
   static async getTopics() {

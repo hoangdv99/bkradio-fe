@@ -11,12 +11,12 @@
         <a href="" class="link -dropdown">Thể loại</a>
         <ul class="sub-menu">
           <li class="list">
-            <a
+            <nuxt-link
               v-for="topic in topics"
               :key="topic.id"
-              :href="'/topic/' + topic.slug"
+              :to="'/topic/' + topic.slug"
               class="item"
-              >{{ topic.title }}</a
+              >{{ topic.title }}</nuxt-link
             >
           </li>
         </ul>
