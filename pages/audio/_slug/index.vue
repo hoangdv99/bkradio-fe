@@ -47,12 +47,12 @@
               :increment="1"
               :star-size="30"
               :show-rating="false"
-              :read-only="!$auth.loggedIn"
+              :read-only="!$auth.loggedIn || audio.ratingHistory.isRated"
               active-on-click
               class="stars"
               @rating-selected="updateRating"
             />
-            <p class="text">10 bình chọn</p>
+            <p class="text">{{ audio.ratingHistory.ratingTimes }} bình chọn</p>
           </div>
           <div v-if="!$auth.loggedIn" class="alert">
             Bạn cần <nuxt-link to="/auth/login">đăng nhập</nuxt-link> để bình
