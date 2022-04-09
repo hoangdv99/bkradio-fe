@@ -72,87 +72,41 @@
         <div class="related-posts">
           <h3 class="title">Có thể bạn quan tâm...</h3>
           <ul class="list">
-            <a href="" class="post">
-              <img
-                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-                alt="post"
-                class="thumbnail"
-              />
-              Đồng Hào Có Ma | Nguyễn Công Hoan
-            </a>
-            <a href="" class="post">
-              <img
-                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-                alt="post"
-                class="thumbnail"
-              />
-              Đồng Hào Có Ma | Nguyễn Công Hoan
-            </a>
-            <a href="" class="post">
-              <img
-                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-                alt="post"
-                class="thumbnail"
-              />
-              Đồng Hào Có Ma | Nguyễn Công Hoan
-            </a>
-            <a href="" class="post">
-              <img
-                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-                alt="post"
-                class="thumbnail"
-              />
-              Đồng Hào Có Ma | Nguyễn Công Hoan
-            </a>
-            <a href="" class="post">
-              <img
-                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-                alt="post"
-                class="thumbnail"
-              />
-              Đồng Hào Có Ma | Nguyễn Công Hoan
-            </a>
-            <a href="" class="post">
-              <img
-                src="https://i0.wp.com/hemradio.com/wp-content/uploads/2020/11/audio-dong-hao-co-ma.gif?resize=390%2C220&ssl=1"
-                alt="post"
-                class="thumbnail"
-              />
-              Đồng Hào Có Ma | Nguyễn Công Hoan
-            </a>
+            <nuxt-link
+              v-for="relatedAudio in audio.relatedAudios"
+              :key="relatedAudio.id"
+              :to="`/audio/${audio.slug}`"
+              class="post"
+            >
+              <img :src="audio.thumbnailUrl" alt="post" class="thumbnail" />
+              {{ audio.title }} | {{ audio.author }}
+            </nuxt-link>
           </ul>
         </div>
         <comment-block></comment-block>
       </div>
-      <v-dialog
-      v-model="dialog"
-      persistent
-      max-width="350"
-    >
-      <v-card>
-        <v-card-title class="text-h5">
-          Tiếp tục nghe?
-        </v-card-title>
-        <v-card-text>Lần trước bạn đã nghe đến {{ convertTime(audio.history) }}</v-card-text>
-        <v-card-actions class="d-flex justify-space-between">
-          <v-btn
-            color="orange darken-1"
-            text
-            class="float-left"
-            @click="listenFromStart"
+      <v-dialog v-model="dialog" persistent max-width="350">
+        <v-card>
+          <v-card-title class="text-h5"> Tiếp tục nghe? </v-card-title>
+          <v-card-text
+            >Lần trước bạn đã nghe đến
+            {{ convertTime(audio.history) }}</v-card-text
           >
-            Nghe từ đầu
-          </v-btn>
-          <v-btn
-            color="primary darken-1"
-            text
-            @click="resumeListening"
-          >
-            Tiếp tục nghe
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <v-card-actions class="d-flex justify-space-between">
+            <v-btn
+              color="orange darken-1"
+              text
+              class="float-left"
+              @click="listenFromStart"
+            >
+              Nghe từ đầu
+            </v-btn>
+            <v-btn color="primary darken-1" text @click="resumeListening">
+              Tiếp tục nghe
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <common-sidebar />
     </div>
   </div>
@@ -185,7 +139,10 @@ export default {
     window.addEventListener('beforeunload', this.saveHistory)
   },
   async mounted() {
-    this.audio = await Audios.getAudioBySlug(this.$auth.user.userId, this.$route.params.slug)
+    this.audio = await Audios.getAudioBySlug(
+      this.$auth.user.userId,
+      this.$route.params.slug
+    )
     await Audios.updateView(this.audio.id, this.$auth.user.userId)
     if (this.audio.history && this.audio.history > 0) {
       this.dialog = true
@@ -202,7 +159,7 @@ export default {
         this.$auth.user.userId,
         this.audio.rating
       )
-      // this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+      this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
     },
     async saveHistory() {
       const currentPlayingTime = this.$refs.player?.currentTime
@@ -227,7 +184,7 @@ export default {
       this.dialog = false
       this.$refs.player.currentTime = this.audio.history
       this.$refs.player.play()
-    }
+    },
   },
 }
 </script>
@@ -379,11 +336,11 @@ export default {
   > .list {
     display: flex;
     flex-flow: wrap;
-    justify-content: space-between;
+    padding: 0;
   }
   > .list > .post {
     width: 30%;
-    margin-bottom: 20px;
+    margin: 0 10px 10px;
     font-size: 14px;
     line-height: 19px;
     color: #2c2f34;
