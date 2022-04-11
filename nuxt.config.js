@@ -56,7 +56,6 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
-    '@vt7/s-vuetify/nuxt',
     ['nuxt-i18n', i18n],
   ],
 
@@ -65,10 +64,10 @@ export default {
       local: {
         // scheme: "refresh",
         token: {
-          property: "token",
-          global: true,
+          property: "accessToken",
           required: true,
-          type: "Bearer"
+          name: 'x-access-token',
+          type: false
         },
         user: {
           property: "user",

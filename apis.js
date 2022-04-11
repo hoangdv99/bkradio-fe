@@ -11,8 +11,11 @@ function createAPI({ $auth, redirect, $config }) {
     hooks: {
       beforeRequest: [
         req => {
-          req.headers.set('x-access-token', `${$auth.strategy.token.get() || ''}`)
-        }
+          req.headers.set(
+            'x-access-token',
+            `${$auth.strategy.token.get() || ''}`
+          )
+        },
       ],
       afterResponse: [
         async (req, options, res) => {
