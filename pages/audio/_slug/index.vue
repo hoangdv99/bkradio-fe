@@ -83,7 +83,7 @@
             </nuxt-link>
           </ul>
         </div>
-        <comment-block></comment-block>
+        <comment-block :audio-id="audio.id"></comment-block>
       </div>
       <v-dialog v-model="dialog" persistent max-width="350">
         <v-card>
@@ -139,11 +139,8 @@ export default {
     window.addEventListener('beforeunload', this.saveHistory)
   },
   async mounted() {
-    this.audio = await Audios.getAudioBySlug(
-      this.$auth.user.userId,
-      this.$route.params.slug
-    )
-    await Audios.updateView(this.audio.id, this.$auth.user.userId)
+    this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+    await Audios.updateView(this.audio.id)
     if (this.audio.history && this.audio.history > 0) {
       this.dialog = true
     }

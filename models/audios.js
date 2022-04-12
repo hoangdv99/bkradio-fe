@@ -38,8 +38,8 @@ export default class Audios {
     return await apis.audioApi.get(`audios/${id}`).json()
   }
 
-  static async getAudioBySlug(userId, slug) {
-    return await apis.audioApi.get(`audios/${slug}?userId=${userId}`).json()
+  static async getAudioBySlug(slug) {
+    return await apis.audioApi.get(`audios/${slug}`).json()
   }
 
   static async updateAudio(audio) {
@@ -50,21 +50,19 @@ export default class Audios {
     return await apis.audioApi.delete(`audios/${id}`)
   }
 
-  static async updateRating(audioId, userId, rating) {
+  static async updateRating(audioId, rating) {
     return await apis.audioApi.patch(`audios/${audioId}`, {
       json: {
         audioId,
-        userId,
         rating
       }
     })
   }
 
-  static async updateView(audioId, userId) {
+  static async updateView(audioId) {
     return await apis.audioApi.patch(`audios/${audioId}/view`, {
       json: {
-        audioId,
-        userId
+        audioId
       }
     })
   }

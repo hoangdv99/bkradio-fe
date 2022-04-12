@@ -1,184 +1,107 @@
 <template>
   <div class="comment-block">
-    <div class="comment-input">
+    <div v-if="$auth.loggedIn" class="comment-input">
       <img
         src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
         alt="avatar"
         class="avatar"
       />
-      <textarea v-model="comment" rows="1" class="textarea" />
-      <span class="btn" @click="cancelComment"
-        ><font-awesome-icon :icon="cancelIcon" class="icon"></font-awesome-icon
-      ></span>
-      <span class="btn"
-        ><font-awesome-icon :icon="sendIcon" class="icon"></font-awesome-icon
-      ></span>
+      <v-textarea
+        v-model="content"
+        rows="1"
+        auto-grow
+        color="blue-grey"
+      ></v-textarea>
+      <v-btn class="mx-2" fab dark small depressed color="blue-grey">
+        <v-icon dark @click="sendComment"> mdi-send </v-icon>
+      </v-btn>
     </div>
-    <ul class="list">
-      <div class="comment-content">
+    <div v-else class="mb-4 text-center">
+      Bạn cần <nuxt-link to="/auth/login">đăng nhập</nuxt-link> để bình luận.
+    </div>
+    <div class="list">
+      <div
+        v-for="comment in comments"
+        :key="comment.id"
+        class="comment-content"
+      >
         <img
           src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
           alt="avatar"
           class="avatar"
         />
         <div class="content">
-          <span class="name">Hoang</span>
-          <span class="time">2 giờ trước</span>
-          <p class="text">Hay quá!</p>
+          <span class="name">{{ comment.username }}</span>
+          <span class="time">{{ convertTime(comment.createdAt) }}</span>
+          <p class="text">{{ comment.content }}</p>
           <div class="actions">
-            <font-awesome-icon
-              :icon="likeIcon"
-              class="icon"
-            ></font-awesome-icon>
-            <span class="number">30</span>
-            <font-awesome-icon :icon="dislikeIcon" class="icon"
-              >30</font-awesome-icon
+            <button
+              class="reply"
+              @click="comment.showReplyInput = !comment.showReplyInput"
             >
-            <span class="number">10</span>
-            <button class="reply" @click="showReplyInput = !showReplyInput">
               Trả lời
             </button>
           </div>
-          <div v-if="showReplyInput" class="comment-input -child">
+          <div v-if="comment.showReplyInput" class="comment-input -child">
             <img
               src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
               alt="avatar"
               class="avatar"
             />
-            <textarea rows="1" class="textarea" />
-            <span class="btn"
-              ><font-awesome-icon
-                :icon="cancelIcon"
-                class="icon"
-                @click="showReplyInput = false"
-              ></font-awesome-icon
-            ></span>
-            <span class="btn"
-              ><font-awesome-icon
-                :icon="sendIcon"
-                class="icon"
-              ></font-awesome-icon
-            ></span>
+            <v-textarea
+              v-model="replyInput"
+              rows="1"
+              auto-grow
+              color="blue-grey"
+            ></v-textarea>
+            <v-btn
+              class="mx-2"
+              fab
+              dark
+              x-small
+              depressed
+              color="blue-grey"
+              @click="sendReply(comment.id)"
+            >
+              <v-icon dark> mdi-send </v-icon>
+            </v-btn>
           </div>
-          <button v-if="!showReplies" class="btn" @click="showReplies = !showReplies">
-            <font-awesome-icon :icon="angleDownIcon"></font-awesome-icon> Xem 4
+          <button
+            v-if="!comment.showReplies && comment.replies.length > 0"
+            class="btn"
+            @click="comment.showReplies = !comment.showReplies"
+          >
+            <v-icon color="blue-grey">mdi-chevron-down</v-icon> Xem
+            {{ comment.replies.length }}
             câu trả lời
           </button>
-          <button v-if="showReplies" class="btn" @click="showReplies = !showReplies">
-            <font-awesome-icon :icon="angleUpIcon"></font-awesome-icon> Ẩn 4
-            câu trả lời
+          <button
+            v-if="comment.showReplies"
+            class="btn"
+            @click="comment.showReplies = !comment.showReplies"
+          >
+            <v-icon color="blue-grey">mdi-chevron-up</v-icon> Ẩn
+            {{ comment.replies.length }} câu trả lời
           </button>
-          <div v-if="showReplies" class="replies">
-            <div class="comment-content -reply">
+          <div v-if="comment.showReplies" class="replies">
+            <div
+              v-for="reply in comment.replies"
+              :key="reply.id"
+              class="comment-content -reply"
+            >
               <img
                 src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
                 alt="avatar"
                 class="avatar"
               />
               <div class="content">
-                <span class="name">Hoang</span>
-                <span class="time">2 giờ trước</span>
-                <p class="text">Hay quá!</p>
+                <span class="name">{{ reply.username }}</span>
+                <span class="time">{{ convertTime(reply.createdAt) }}</span>
+                <p class="text">{{ reply.content }}</p>
                 <div class="actions">
-                  <font-awesome-icon
-                    :icon="likeIcon"
-                    class="icon"
-                  ></font-awesome-icon>
-                  <span class="number">30</span>
-                  <font-awesome-icon :icon="dislikeIcon" class="icon"
-                    >30</font-awesome-icon
-                  >
-                  <span class="number">10</span>
                   <button
                     class="reply"
-                    @click="showReplyInput = !showReplyInput"
-                  >
-                    Trả lời
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="comment-content -reply">
-              <img
-                src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
-                alt="avatar"
-                class="avatar"
-              />
-              <div class="content">
-                <span class="name">Hoang</span>
-                <span class="time">2 giờ trước</span>
-                <p class="text">Hay quá!</p>
-                <div class="actions">
-                  <font-awesome-icon
-                    :icon="likeIcon"
-                    class="icon"
-                  ></font-awesome-icon>
-                  <span class="number">30</span>
-                  <font-awesome-icon :icon="dislikeIcon" class="icon"
-                    >30</font-awesome-icon
-                  >
-                  <span class="number">10</span>
-                  <button
-                    class="reply"
-                    @click="showReplyInput = !showReplyInput"
-                  >
-                    Trả lời
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="comment-content -reply">
-              <img
-                src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
-                alt="avatar"
-                class="avatar"
-              />
-              <div class="content">
-                <span class="name">Hoang</span>
-                <span class="time">2 giờ trước</span>
-                <p class="text">Hay quá!</p>
-                <div class="actions">
-                  <font-awesome-icon
-                    :icon="likeIcon"
-                    class="icon"
-                  ></font-awesome-icon>
-                  <span class="number">30</span>
-                  <font-awesome-icon :icon="dislikeIcon" class="icon"
-                    >30</font-awesome-icon
-                  >
-                  <span class="number">10</span>
-                  <button
-                    class="reply"
-                    @click="showReplyInput = !showReplyInput"
-                  >
-                    Trả lời
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="comment-content -reply">
-              <img
-                src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
-                alt="avatar"
-                class="avatar"
-              />
-              <div class="content">
-                <span class="name">Hoang</span>
-                <span class="time">2 giờ trước</span>
-                <p class="text">Hay quá!</p>
-                <div class="actions">
-                  <font-awesome-icon
-                    :icon="likeIcon"
-                    class="icon"
-                  ></font-awesome-icon>
-                  <span class="number">30</span>
-                  <font-awesome-icon :icon="dislikeIcon" class="icon"
-                    >30</font-awesome-icon
-                  >
-                  <span class="number">10</span>
-                  <button
-                    class="reply"
-                    @click="showReplyInput = !showReplyInput"
+                    @click="comment.showReplyInput = !comment.showReplyInput"
                   >
                     Trả lời
                   </button>
@@ -188,42 +111,96 @@
           </div>
         </div>
       </div>
-    </ul>
+    </div>
+    <v-btn
+      v-if="commentPage < totalCommentPage"
+      block
+      depressed
+      color="blue-grey"
+      text
+      class="mt-4"
+      @click="loadMoreComments"
+    >
+      Xem thêm
+    </v-btn>
   </div>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import {
-  faPaperPlane,
-  faThumbsUp,
-  faThumbsDown,
-  faBackspace,
-  faAngleDown,
-  faAngleUp,
-} from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
+import 'moment/locale/vi'
+import Comments from '@/models/comments.js'
+moment.locales('vi')
 export default {
   name: 'CommentBlock',
-  components: {
-    FontAwesomeIcon,
-  },
+  props: ['audioId'],
   data() {
     return {
-      sendIcon: faPaperPlane,
-      likeIcon: faThumbsUp,
-      dislikeIcon: faThumbsDown,
-      cancelIcon: faBackspace,
-      angleDownIcon: faAngleDown,
-      angleUpIcon: faAngleUp,
       showReplyInput: false,
-      showReplies: false,
-      comment: null,
+      content: null,
+      replyInput: null,
+      comments: [],
+      commentPage: 1,
+      totalCommentPage: 0,
     }
   },
+  async mounted() {
+    await this.getComments()
+  },
   methods: {
-    cancelComment() {
-      this.comment = null
+    async sendComment() {
+      await Comments.saveComment({
+        audioId: this.audioId,
+        userId: this.$auth.user.userId,
+        content: this.content,
+        isReply: false,
+      })
+      this.content = null
+      await this.getComments()
     },
-  }
+    async sendReply(commentId) {
+      await Comments.saveComment({
+        audioId: this.audioId,
+        userId: this.$auth.user.userId,
+        content: this.replyInput,
+        isReply: true,
+        parentCommentId: commentId,
+      })
+      this.replyInput = null
+      await this.getComments()
+      const currentComment = this.comments.find(
+        (comment) => comment.id === commentId
+      )
+      currentComment.showReplies = true
+    },
+    convertTime(time) {
+      return moment(time).fromNow()
+    },
+    async loadMoreComments() {
+      this.commentPage++
+      const { comments } = await Comments.getComments({
+        audioId: this.audioId,
+        page: this.commentPage,
+        perPage: 5,
+      })
+      this.comments = [...this.comments, ...comments]
+    },
+    async likeComment(commentId) {
+      await Comments.like({
+        commentId,
+        userId: this.$auth.user.userId,
+        action: 'like',
+      })
+    },
+    async getComments() {
+      const { comments, pagination } = await Comments.getComments({
+        audioId: this.audioId,
+        page: this.commentPage,
+        perPage: 5,
+      })
+      this.comments = comments
+      this.totalCommentPage = pagination.lastPage
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -237,6 +214,7 @@ export default {
 .comment-input {
   display: flex;
   margin-bottom: 30px;
+  align-items: center;
   > .avatar {
     width: 40px;
     height: 40px;
@@ -293,6 +271,7 @@ export default {
   > .content > .text {
     font-size: 14px;
     line-height: 1.4;
+    margin: 0;
     padding: 5px 0;
   }
   > .content > .btn {
@@ -307,14 +286,6 @@ export default {
   }
   > .content > .actions {
     margin-bottom: 5px;
-  }
-  > .content > .actions > .icon {
-    &:hover {
-      color: #9ebaa0;
-    }
-  }
-  > .content > .actions > .number {
-    margin-right: 10px;
   }
   > .content > .actions > .reply {
     font-weight: 500;
