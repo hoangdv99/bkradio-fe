@@ -10,7 +10,7 @@
           placeholder="Nhập tên tài khoản"
           class="input"
         />
-        <font-awesome-icon :icon="userIcon" class="icon"></font-awesome-icon>
+        <v-icon class="icon">mdi-account</v-icon>
       </div>
       <div class="field">
         <span class="label">Mật khẩu</span>
@@ -20,7 +20,7 @@
           placeholder="Nhập mật khẩu"
           class="input"
         />
-        <font-awesome-icon :icon="lockIcon" class="icon"></font-awesome-icon>
+        <v-icon class="icon">mdi-lock</v-icon>
       </div>
       <a href="#" class="link">Quên mật khẩu?</a>
       <button type="submit" class="btn">Đăng nhập</button>
@@ -31,22 +31,15 @@
   </div>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUser, faLock } from '@fortawesome/free-solid-svg-icons'
 export default {
   layoutContent() {
     return {
-      showSidebar: false
+      showSidebar: false,
     }
   },
   name: 'LoginPage',
-  components: {
-    FontAwesomeIcon,
-  },
   data() {
     return {
-      userIcon: faUser,
-      lockIcon: faLock,
       loginData: {
         username: '',
         password: '',

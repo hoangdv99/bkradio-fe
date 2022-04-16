@@ -2,10 +2,7 @@
   <div class="app-sidebar">
     <div class="wrapped-content -lastviewed">
       <div class="title">
-        <font-awesome-icon
-          :icon="thumbtackIcon"
-          class="icon"
-        ></font-awesome-icon>
+        <v-icon color="white">mdi-playlist-play</v-icon>
         Danh sách tiếp tục nghe
       </div>
       <div v-if="$auth.loggedIn" class="posts">
@@ -27,7 +24,7 @@
     </div>
     <div class="wrapped-content -mostviewed">
       <div class="title">
-        <font-awesome-icon :icon="bookIcon" class="icon"></font-awesome-icon>
+        <v-icon color="white">mdi-trending-up</v-icon>
         Nghe nhiều nhất
       </div>
       <v-tabs color="blue-grey" class="mt-2 mb-2">
@@ -52,19 +49,12 @@
   </div>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faThumbtack, faBook } from '@fortawesome/free-solid-svg-icons'
 import Audios from '~/models/audios'
 
 export default {
   name: 'AppSidebar',
-  components: {
-    FontAwesomeIcon,
-  },
   data() {
     return {
-      thumbtackIcon: faThumbtack,
-      bookIcon: faBook,
       lastViewedAudios: [],
       trendingAudios: [],
     }

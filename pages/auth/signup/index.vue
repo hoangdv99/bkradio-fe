@@ -10,7 +10,7 @@
           placeholder="Nhập tên tài khoản"
           class="input"
         />
-        <font-awesome-icon :icon="userIcon" class="icon"></font-awesome-icon>
+        <v-icon class="icon">mdi-account</v-icon>
       </div>
       <div class="field">
         <span class="label">Mật khẩu</span>
@@ -20,7 +20,7 @@
           placeholder="Nhập mật khẩu"
           class="input"
         />
-        <font-awesome-icon :icon="lockIcon" class="icon"></font-awesome-icon>
+        <v-icon class="icon">mdi-lock</v-icon>
       </div>
       <div class="field">
         <span class="label">Nhập lại mật khẩu</span>
@@ -30,7 +30,7 @@
           placeholder="Nhập lại mật khẩu"
           class="input"
         />
-        <font-awesome-icon :icon="lockIcon" class="icon"></font-awesome-icon>
+        <v-icon class="icon">mdi-lock</v-icon>
       </div>
       <button type="submit" class="btn">Đăng ký</button>
       <NuxtLink to="/auth/login" class="link"
@@ -40,17 +40,10 @@
   </div>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUser, faLock } from '@fortawesome/free-solid-svg-icons'
 export default {
   name: 'LoginPage',
-  components: {
-    FontAwesomeIcon,
-  },
   data() {
     return {
-      userIcon: faUser,
-      lockIcon: faLock,
       signupData: {
         username: '',
         password: '',

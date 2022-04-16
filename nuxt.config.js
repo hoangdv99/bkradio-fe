@@ -24,12 +24,10 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '@/assets/scss/app.scss',
-    '@fortawesome/fontawesome-svg-core/styles.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/fontawesome.js',
     '~/plugins/layout-content.js',
     '~/plugins/vuetify.js',
     { src: '~/plugins/vue-plyr', mode: 'client' },

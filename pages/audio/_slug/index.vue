@@ -14,11 +14,11 @@
             <h2 class="subtitle">Giọng Đọc : {{ audio.voice }}</h2>
             <div class="statistic">
               <div class="comment">
-                <font-awesome-icon :icon="commentIcon"></font-awesome-icon>
+                <v-icon>mdi-comment</v-icon>
                 <span>0</span>
               </div>
               <div class="view">
-                <font-awesome-icon :icon="viewIcon"></font-awesome-icon>
+                <v-icon>mdi-eye</v-icon>
                 <span>{{ audio.views }}</span>
               </div>
             </div>
@@ -112,8 +112,6 @@
   </div>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faComments, faEye } from '@fortawesome/free-solid-svg-icons'
 import CommentBlock from './-comment.vue'
 import Audios from '@/models/audios'
 export default {
@@ -124,13 +122,10 @@ export default {
   },
   name: 'DetailPage',
   components: {
-    FontAwesomeIcon,
     CommentBlock,
   },
   data() {
     return {
-      commentIcon: faComments,
-      viewIcon: faEye,
       audio: null,
       dialog: false,
     }

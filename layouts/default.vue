@@ -10,7 +10,7 @@
         <layout-footer></layout-footer>
       </div>
       <div :class="'pagetop' + (hide ? ' -hide' : '')" @click="goTop">
-        <font-awesome-icon :icon="angleUpIcon" />
+        <v-icon color="white">mdi-chevron-up</v-icon>
       </div>
       <v-snackbar
         :value="snackbar.showing"
@@ -27,19 +27,13 @@
   </v-app>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons'
 import { createNamespacedHelpers } from '@/util'
 const { $get } = createNamespacedHelpers('layout')
 
 export default {
   name: 'DefaultLayout',
-  components: {
-    FontAwesomeIcon,
-  },
   data() {
     return {
-      angleUpIcon: faAngleUp,
       hide: true,
     }
   },
