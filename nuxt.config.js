@@ -48,6 +48,7 @@ export default {
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     '@nuxtjs/vuetify',
+    '@nuxtjs/style-resources',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -79,6 +80,12 @@ export default {
       }
     },
     plugins: ['~/apis.js']
+  },
+
+  styleResources: {
+    scss: [
+      '~/assets/scss/util/*.scss',
+    ],
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
