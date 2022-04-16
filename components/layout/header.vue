@@ -1,89 +1,117 @@
 <template>
-  <header class="app-header">
-    <nuxt-link to="/" class="logo">
-      <img src="/hemradio.png" alt="logo" />
-    </nuxt-link>
-    <ul class="menu">
-      <li class="item -active">
-        <a href="" class="link">Trang chủ</a>
-      </li>
-      <li class="item">
-        <a href="" class="link -dropdown">Thể loại</a>
-        <ul class="sub-menu">
-          <li class="list">
-            <nuxt-link
-              v-for="topic in topics"
-              :key="topic.id"
-              :to="'/topic/' + topic.slug"
-              class="item"
-              >{{ topic.title }}</nuxt-link
-            >
-          </li>
-        </ul>
-      </li>
-      <li class="item">
-        <a href="" class="link -dropdown">Giọng đọc</a>
-        <ul class="sub-menu -voices">
-          <li class="list">
-            <nuxt-link
-              v-for="voice in maleVoices"
-              :key="voice.id"
-              :to="'/voice/' + voice.slug"
-              class="item"
-              >{{ voice.name }}</nuxt-link
-            >
-          </li>
-          <li class="list">
-            <nuxt-link
-              v-for="voice in femaleVoices"
-              :key="voice.id"
-              :to="'/voice/' + voice.slug"
-              class="item"
-              >{{ voice.name }}</nuxt-link
-            >
-          </li>
-        </ul>
-      </li>
-      <li class="item">
-        <a href="" class="link">Blog</a>
-      </li>
-    </ul>
-    <div class="search">
-      <input type="text" class="input" placeholder="Nhập nội dung cần tìm..." />
-      <font-awesome-icon :icon="searchIcon" class="icon" />
-    </div>
-    <div v-if="isAuthenticated" class="account">
-      <img
-        src="~/assets/images/default-avatar.jpg"
-        alt="Avatar"
-        class="avatar"
-      />
-      <ul class="sub-menu">
-        <li class="list">
-          <nuxt-link to="/admin/audio" class="item">Quản lý audio</nuxt-link>
-          <div class="item" @click="logout">Đăng xuất</div>
+  <div class="app-header">
+    <header class="header">
+      <nuxt-link to="/" class="logo">
+        <img src="/hemradio.png" alt="logo" />
+      </nuxt-link>
+      <ul class="menu">
+        <li class="item -active">
+          <a href="" class="link">Trang chủ</a>
+        </li>
+        <li class="item">
+          <a href="" class="link -dropdown">Thể loại</a>
+          <ul class="sub-menu">
+            <li class="list">
+              <nuxt-link
+                v-for="topic in topics"
+                :key="topic.id"
+                :to="'/topic/' + topic.slug"
+                class="item"
+                >{{ topic.title }}</nuxt-link
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="item">
+          <a href="" class="link -dropdown">Giọng đọc</a>
+          <ul class="sub-menu -voices">
+            <li class="list">
+              <nuxt-link
+                v-for="voice in maleVoices"
+                :key="voice.id"
+                :to="'/voice/' + voice.slug"
+                class="item"
+                >{{ voice.name }}</nuxt-link
+              >
+            </li>
+            <li class="list">
+              <nuxt-link
+                v-for="voice in femaleVoices"
+                :key="voice.id"
+                :to="'/voice/' + voice.slug"
+                class="item"
+                >{{ voice.name }}</nuxt-link
+              >
+            </li>
+          </ul>
         </li>
       </ul>
-    </div>
-    <NuxtLink v-else to="/auth/login" class="auth">Đăng nhập</NuxtLink>
-  </header>
+      <div
+        ref="search"
+        class="search"
+        tabindex="0"
+        @focus="handleFocus"
+        @focusout="handleFocusOut"
+      >
+        <input
+          ref="input"
+          v-model="keyword"
+          type="text"
+          class="input"
+          placeholder="Nhập nội dung cần tìm..."
+          tabindex="1"
+          @focus="handleFocus"
+          @input="search"
+        />
+        <v-icon class="icon">mdi-magnify</v-icon>
+        <div v-if="keyword !== ''" class="search-result">
+          <p v-if="searchResult.length === 0" class="text-center">
+            Không tìm thấy kết quả phù hợp.
+          </p>
+          <div
+            v-for="audio in searchResult"
+            :key="audio.id"
+            class="post"
+            @click="goToDetailPage(audio)"
+          >
+            <img :src="audio.thumbnailUrl" alt="thumbnail" class="thumbnail" />
+            <p :to="`/audio/${audio.slug}`" class="title">
+              {{ audio.title }} | {{ audio.author }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div v-if="isAuthenticated" class="account">
+        <img
+          src="~/assets/images/default-avatar.jpg"
+          alt="Avatar"
+          class="avatar"
+        />
+        <ul class="sub-menu">
+          <li class="list">
+            <nuxt-link to="/admin/audio" class="item">Quản lý audio</nuxt-link>
+            <div class="item" @click="logout">Đăng xuất</div>
+          </li>
+        </ul>
+      </div>
+      <NuxtLink v-else to="/auth/login" class="auth">Đăng nhập</NuxtLink>
+    </header>
+  </div>
 </template>
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import Audios from '@/models/audios'
 import Voices from '@/models/voices'
 export default {
   name: 'AppHeader',
-  components: {
-    FontAwesomeIcon,
-  },
   data() {
     return {
-      searchIcon: faSearch,
       topics: [],
       maleVoices: [],
       femaleVoices: [],
+      keyword: '',
+      searchResult: [],
+      timeout: null,
+      openPopup: false,
     }
   },
   computed: {
@@ -94,32 +122,55 @@ export default {
   async mounted() {
     this.topics = await Audios.getTopics()
     const totalVoices = await Voices.getVoices()
-    this.maleVoices = totalVoices.filter(voice => voice.gender === 1)
-    this.femaleVoices = totalVoices.filter(voice => voice.gender === 2)
+    this.maleVoices = totalVoices.filter((voice) => voice.gender === 1)
+    this.femaleVoices = totalVoices.filter((voice) => voice.gender === 2)
   },
   methods: {
     async logout() {
       await this.$auth.logout()
+    },
+    search() {
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(async () => {
+        const { audios } = await Audios.getAudios({
+          searchKeyword: this.keyword,
+        })
+        this.searchResult = audios
+        this.$refs.input.focus()
+      }, 500)
+    },
+    goToDetailPage(audio) {
+      this.keyword = ''
+      this.searchResult = []
+      this.$router.push(`/audio/${audio.slug}`)
+    },
+    handleFocus() {
+      this.$refs.search.classList.remove('-hideresult')
+    },
+    handleFocusOut() {
+      this.$refs.search.classList.add('-hideresult')
     },
   },
 }
 </script>
 <style lang="scss" scoped>
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  height: 73px;
-  background-color: #627c83;
-  padding: 0 30px;
-  > .logo {
+  > .header {
+    display: flex;
+    justify-content: space-between;
+    height: 73px;
+    background-color: #627c83;
+    padding: 0 30px;
+  }
+  > .header > .logo {
     width: 200px;
     margin-top: 20px;
     margin-bottom: 20px;
   }
-  > .menu {
+  > .header > .menu {
     display: table;
   }
-  > .menu > .item {
+  > .header > .menu > .item {
     display: table-cell;
     position: relative;
     &:hover {
@@ -152,10 +203,10 @@ export default {
       transition: 0.3s;
     }
   }
-  > .menu > .item > .sub-menu {
+  > .header > .menu > .item > .sub-menu {
     position: absolute;
   }
-  > .menu > .item > .link {
+  > .header > .menu > .item > .link {
     display: block;
     padding: 0 14px;
     height: 73px;
@@ -181,26 +232,27 @@ export default {
       }
     }
   }
-  > .search {
+  > .header > .search {
     position: relative;
     margin-top: auto;
     margin-bottom: auto;
   }
-  > .search > .input {
+  > .header > .search > .input {
+    width: 240px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 35px;
     padding: 10px 20px 10px 10px;
     color: #daeaea;
   }
-  > .search > .icon {
+  > .header > .search > .icon {
     position: absolute;
-    font-size: 14px;
+    font-size: 18px;
     color: #daeaea;
     right: 10px;
     top: 14px;
     cursor: pointer;
   }
-  > .account {
+  > .header > .account {
     display: flex;
     justify-content: center;
     position: relative;
@@ -209,7 +261,7 @@ export default {
       display: block;
     }
   }
-  > .account > .avatar {
+  > .header > .account > .avatar {
     margin: auto;
     vertical-align: middle;
     width: 50px;
@@ -217,12 +269,12 @@ export default {
     border-radius: 50%;
     cursor: pointer;
   }
-  > .account > .sub-menu {
+  > .header > .account > .sub-menu {
     position: absolute;
     top: 100%;
     right: 0;
   }
-  > .auth {
+  > .header > .auth {
     display: block;
     padding: 0 14px;
     height: 73px;
@@ -235,6 +287,22 @@ export default {
     &:hover {
       color: #9ebaa0;
     }
+  }
+  > .header > .search {
+    outline: none;
+    &.-hideresult > .search-result {
+      display: none;
+    }
+  }
+  > .header > .search > .input {
+    outline: none;
+  }
+  > .header > .search > .search-result {
+    position: absolute;
+    left: 0;
+    top: 40px;
+    width: 370px;
+    z-index: 999;
   }
 }
 .sub-menu {
@@ -272,6 +340,44 @@ export default {
         border-top: none;
       }
     }
+  }
+}
+.search-result {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  > .post {
+    display: flex;
+    margin-bottom: 10px;
+    transition: 0.3s;
+    border-radius: 15px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    &:hover {
+      opacity: 0.8;
+      transform: translateY(-0.15rem);
+      box-shadow: 0 4px 7px rgb(0 0 0 / 20%);
+      > .title {
+        color: #9ebaa0;
+      }
+    }
+  }
+  > .post > .thumbnail {
+    width: 120px;
+    height: 80px;
+    border-radius: 15px;
+    margin-right: 15px;
+    cursor: pointer;
+  }
+  > .post > .title {
+    font-size: 14px !important;
+    line-height: 1.4;
+    color: #333;
+    font-weight: 600;
+    transition: 0.15s;
+    cursor: pointer;
   }
 }
 </style>
