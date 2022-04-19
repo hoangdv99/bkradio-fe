@@ -1,15 +1,13 @@
 <template>
   <div class="app-header">
     <header class="header">
-      <nuxt-link to="/" class="logo">
-        <img src="/hemradio.png" alt="logo" />
-      </nuxt-link>
+      <NuxtLink to="/" class="logo">BK.RADIO</NuxtLink>
       <ul class="menu">
-        <li class="item -active">
-          <a href="" class="link">Trang chủ</a>
+        <li ref="home" class="item -active">
+          <nuxt-link to="/" class="link">Trang chủ</nuxt-link>
         </li>
-        <li class="item">
-          <a href="" class="link -dropdown">Thể loại</a>
+        <li ref="topic" class="item">
+          <div href="" class="link -dropdown">Thể loại</div>
           <ul class="sub-menu">
             <li class="list">
               <nuxt-link
@@ -22,7 +20,7 @@
             </li>
           </ul>
         </li>
-        <li class="item">
+        <li ref="voice" class="item">
           <a href="" class="link -dropdown">Giọng đọc</a>
           <ul class="sub-menu -voices">
             <li class="list">
@@ -119,6 +117,29 @@ export default {
       return this.$store.getters.isAuthenticated
     },
   },
+  watch: {
+    $route(to, from) {
+      switch (to.name) {
+        case 'index':
+          this.$refs.home.classList.add('-active')
+          this.$refs.topic.classList.remove('-active')
+          this.$refs.voice.classList.remove('-active')
+          break
+        case 'topic-slug':
+          this.$refs.topic.classList.add('-active')
+          this.$refs.home.classList.remove('-active')
+          this.$refs.voice.classList.remove('-active')
+          break
+        case 'voice-slug':
+          this.$refs.voice.classList.add('-active')
+          this.$refs.home.classList.remove('-active')
+          this.$refs.topic.classList.remove('-active')
+          break
+        default:
+          break
+      }
+    },
+  },
   async mounted() {
     this.topics = await Audios.getTopics()
     const totalVoices = await Voices.getVoices()
@@ -163,9 +184,18 @@ export default {
     padding: 0 30px;
   }
   > .header > .logo {
-    width: 200px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    display: block;
+    padding: 0 14px;
+    height: 73px;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    line-height: 73px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  > .header > .logo > .image {
+    border-radius: 50%;
   }
   > .header > .menu {
     display: table;
