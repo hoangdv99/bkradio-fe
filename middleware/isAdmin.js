@@ -1,7 +1,7 @@
-import { userRole } from "~/constants";
+import { userRole } from "~/constants"
 
-export default function({ store, redirect }) {
+export default function ({ store, redirect }) {
   if (store.state.auth.user.roleId !== userRole.ADMIN) {
-    return redirect("/");
+    return redirect("/errors/403")
   }
 }

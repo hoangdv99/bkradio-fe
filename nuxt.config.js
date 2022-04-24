@@ -89,6 +89,15 @@ export default {
     ],
   },
 
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.push({
+        path: '*',
+        redirect: '/errors/404',
+      })
+    },
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     transpile: [({ isLegacy }) => isLegacy && 'vuetify/lib']
