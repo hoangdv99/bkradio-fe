@@ -40,6 +40,9 @@
   </div>
 </template>
 <script>
+import Authentication from '@/models/auth'
+import { createNamespacedHelpers } from '@/util'
+const { $dispatch } = createNamespacedHelpers('layout')
 export default {
   name: 'LoginPage',
   data() {
@@ -53,14 +56,59 @@ export default {
   },
   methods: {
     async signup() {
-      const res = await this.$axios.post('auth/signup', {
-        json: {
-          username: this.signupData.username,
-          password: this.signupData.password,
-        },
-      })
-      this.$router.replace('/')
-      console.log(res)
+      if (this.checkSignUpData()) {
+        try {
+          await Authentication.signup({
+            username: this.signupData.username,
+            password: this.signupData.password,
+          })
+          $dispatch('setSnackbar', {
+            showing: true,
+            text: 'Tạo tài khoản mới thành công',
+            color: 'success',
+          })
+          await this.$auth.loginWith('local', {
+            data: {
+              username: this.signupData.username,
+              password: this.signupData.password,
+            },
+          })
+          this.$router.push({ path: '/' })
+        } catch (error) {
+          if (error.statusCode === 409) {
+            $dispatch('setSnackbar', {
+              showing: true,
+              text: 'Tên tài khoản đã tồn tại',
+              color: 'error',
+            })
+          } else {
+            $dispatch('setSnackbar', {
+              showing: true,
+              text: 'Có lỗi xảy ra',
+              color: 'error',
+            })
+          }
+        }
+      }
+    },
+    checkSignUpData() {
+      if (this.signupData.password.length < 6) {
+        $dispatch('setSnackbar', {
+          showing: true,
+          text: 'Mật khẩu phải có độ dài lớn hơn 6',
+          color: 'error',
+        })
+        return false
+      }
+      if (this.signupData.password !== this.signupData.confirmPassword) {
+        $dispatch('setSnackbar', {
+          showing: true,
+          text: 'Hai mật khẩu không khớp.',
+          color: 'error',
+        })
+        return false
+      }
+      return true
     },
   },
 }
