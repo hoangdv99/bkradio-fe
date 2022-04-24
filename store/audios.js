@@ -8,22 +8,15 @@ export const state = () => ({
   authors: [],
   voices: [],
   audios: [],
+  topics: [],
 })
 
 export const mutations = {
   ...make.mutations(state),
-  ADD_AUDIO(state, audio) {
-    state.audios.push(audio)
-  },
-  SET_AUDIOS(state, audios) {
-    state.audios = audios
-  },
-  ADD_VOICE(state, voice) {
-    state.voices.push(voice)
-  },
-  SET_VOICES(state, voices) {
-    state.voices = voices
-  },
+}
+
+export const getters = {
+  ...make.getters(state)
 }
 
 export const actions = {
@@ -68,5 +61,9 @@ export const actions = {
         color: 'error'
       })
     }
-  }
+  },
+  async getTopics({ commit }) {
+    const topics = await Audios.getTopics()
+    commit('SET_TOPICS', topics)
+  },
 }

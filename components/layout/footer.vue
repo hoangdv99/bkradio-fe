@@ -30,6 +30,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-footer {
+  @include sp {
+    margin-top: 0;
+    padding: 10px;
+  }
   margin-top: 50px;
   background-color: #627c83;
   text-align: center;
@@ -38,8 +42,12 @@ export default {
   > .menu {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
   }
   > .menu > .item {
+    @include sp {
+      padding: 5px;
+    }
     padding: 10px;
     color: #daeaea;
   }

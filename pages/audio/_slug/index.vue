@@ -14,12 +14,12 @@
             <h2 class="subtitle">Giọng Đọc : {{ audio.voice }}</h2>
             <div class="statistic">
               <div class="comment">
-                <v-icon>mdi-comment</v-icon>
-                <span>0</span>
+                <v-icon small>mdi-comment</v-icon>
+                <span class="text">0</span>
               </div>
               <div class="view">
-                <v-icon>mdi-eye</v-icon>
-                <span>{{ audio.views }}</span>
+                <v-icon small>mdi-eye</v-icon>
+                <span class="text">{{ audio.views }}</span>
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@
             <star-rating
               v-model="audio.rating"
               :increment="1"
-              :star-size="30"
+              :star-size="device === 'mobile' ? 20 : 30"
               :show-rating="false"
               :read-only="!$auth.loggedIn || audio.ratingHistory.isRated"
               active-on-click
@@ -107,13 +107,15 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <common-sidebar />
+      <common-sidebar v-if="device !== 'mobile'" />
     </div>
   </div>
 </template>
 <script>
 import CommentBlock from './-comment.vue'
 import Audios from '@/models/audios'
+import { createNamespacedHelpers } from '@/util'
+const { $get } = createNamespacedHelpers('layout')
 export default {
   layoutContent() {
     return {
@@ -129,6 +131,9 @@ export default {
       audio: null,
       dialog: false,
     }
+  },
+  computed: {
+    device: $get('device'),
   },
   beforeMount() {
     window.addEventListener('beforeunload', this.saveHistory)
@@ -184,8 +189,14 @@ export default {
 .detail-page {
   > .container {
     display: flex;
+    @include sp {
+      padding: 0;
+    }
   }
   > .container > .content {
+    @include sp {
+      width: 100%;
+    }
     width: 66%;
   }
 }
@@ -193,10 +204,20 @@ export default {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   margin-bottom: 30px;
+  @include sp {
+    margin-bottom: 20px;
+  }
   > .header {
+    @include sp {
+      padding: 10px;
+    }
     padding: 30px 30px 20px;
   }
   > .header > .title {
+    @include sp {
+      margin-bottom: 10px;
+      font-size: 20px !important;
+    }
     font-size: 30px !important;
     text-transform: capitalize;
     margin-bottom: 15px;
@@ -204,6 +225,9 @@ export default {
     color: #2c3f34;
   }
   > .header > .subtitle {
+    @include sp {
+      font-size: 16px;
+    }
     font-size: 22px;
     line-height: 27px;
     font-weight: normal;
@@ -220,8 +244,21 @@ export default {
   > .header > .statistic > .comment {
     margin-right: 10px;
   }
+  > .header > .statistic > .comment > .text {
+    @include sp {
+      font-size: 14px;
+    }
+  }
+  > .header > .statistic > .view > .text {
+    @include sp {
+      font-size: 14px;
+    }
+  }
   > .featured {
     margin-bottom: 30px;
+    @include sp {
+      margin-bottom: 10px;
+    }
   }
   > .featured > .image {
     width: 100%;
@@ -237,6 +274,9 @@ export default {
     color: #fff;
   }
   > .description {
+    @include sp {
+      padding: 10px;
+    }
     padding: 0 30px 20px;
     font-size: 15px;
     color: #2c2f34;
@@ -258,6 +298,10 @@ export default {
     text-align: right;
   }
   > .notice {
+    @include sp {
+      padding: 0 10px 10px;
+      margin: 0;
+    }
     padding: 0 30px 20px;
     font-size: 15px;
     font-weight: 600;
@@ -270,6 +314,10 @@ export default {
     padding: 0 30px 20px;
   }
   > .tags > .tag {
+    @include sp {
+      padding: 10px;
+      font-size: 14px;
+    }
     font-size: 15px;
     color: #2c2f34;
     padding: 15px;
@@ -286,11 +334,18 @@ export default {
   }
 }
 .related-posts {
+  @include sp {
+    padding: 10px;
+    margin-bottom: 20px;
+  }
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   padding: 30px 30px 20px;
   margin-bottom: 30px;
   > .title {
+    @include sp {
+      font-size: 16px !important;
+    }
     position: relative;
     opacity: 0.99;
     display: inline-block !important;
@@ -331,9 +386,14 @@ export default {
     padding: 0;
   }
   > .list > .post {
+    @include sp {
+      margin: 0 5px 5px;
+      width: 29%;
+      font-size: 13px !important;
+    }
     width: 30%;
     margin: 0 10px 10px;
-    font-size: 14px;
+    font-size: 14px !important;
     line-height: 19px;
     color: #2c2f34;
     font-weight: 600;
@@ -345,6 +405,10 @@ export default {
   }
   > .list > .post > .thumbnail {
     border-radius: 15px;
+    @include sp {
+      border-radius: 10px;
+      height: 80px;
+    }
   }
 }
 </style>

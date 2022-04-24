@@ -4,6 +4,7 @@ export const state = () => ({
   showSidebar: false,
   breadcrumbs: [],
   snackbar: {},
+  device: {},
 })
 
 export const mutations = {
@@ -16,5 +17,8 @@ export const actions = {
     setTimeout(() => {
       commit('SET_SNACKBAR', {})
     }, 3000)
-  }
+  },
+  setDevice({ commit }, value) {
+    commit('SET_DEVICE', value)
+  },
 }

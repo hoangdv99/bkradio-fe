@@ -32,7 +32,8 @@ export default {
     '~/plugins/vuetify.js',
     { src: '~/plugins/vue-plyr', mode: 'client' },
     { src: '~/plugins/vue-star-rating', mode: 'client' },
-    '~/apis'
+    '~/apis',
+    '~/plugins/mixin',
   ],
 
   publicRuntimeConfig: {

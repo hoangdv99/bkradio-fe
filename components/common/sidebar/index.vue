@@ -27,11 +27,6 @@
         <v-icon color="white">mdi-trending-up</v-icon>
         Nghe nhiều nhất
       </div>
-      <v-tabs color="blue-grey" class="mt-2 mb-2">
-        <v-tab @click="getTrendingAudios('all')">Tất cả</v-tab>
-        <v-tab @click="getTrendingAudios('all')">Tuần</v-tab>
-        <v-tab @click="getTrendingAudios('all')">Tháng</v-tab>
-      </v-tabs>
       <div class="posts">
         <li
           v-for="audio in trendingAudios"
@@ -83,6 +78,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-sidebar {
+  @include sp {
+    width: 100%;
+    padding: 0;
+  }
   position: relative;
   overflow: visible;
   width: 33.33333%;
@@ -92,6 +91,9 @@ export default {
   }
 }
 .wrapped-content {
+  @include sp {
+    padding: 10px;
+  }
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   padding: 30px;
@@ -100,7 +102,7 @@ export default {
     position: relative;
     padding: 0 10px;
     width: auto;
-    font-size: 15px;
+    font-size: 15px !important;
     line-height: 27px;
     font-weight: 500;
     margin-bottom: 20px;
@@ -144,7 +146,7 @@ export default {
     }
   }
   &.-mostviewed > .title {
-    margin-bottom: 0;
+    margin-bottom: 20px;
   }
   &.-mostviewed > .posts {
     counter-reset: post-widget-counter;

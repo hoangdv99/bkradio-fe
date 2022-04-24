@@ -2,8 +2,8 @@
   <v-app>
     <div class="default-layout">
       <div class="layout">
-        <layout-header></layout-header>
-        <layout-breadcrumbs></layout-breadcrumbs>
+        <layout-sp-header v-if="device === 'mobile'" />
+        <layout-header v-else />
         <main class="main">
           <nuxt class="content"></nuxt>
         </main>
@@ -39,6 +39,7 @@ export default {
   },
   computed: {
     snackbar: $get('snackbar'),
+    device: $get('device'),
   },
   mounted() {
     window.addEventListener('scroll', this.updateScroll)
@@ -55,6 +56,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .default-layout {
+  overflow: hidden;
+  position: relative;
   > .layout {
     display: block;
     max-width: 1230px;
@@ -70,8 +73,10 @@ export default {
     }
   }
   > .layout > .main {
-    margin-top: 30px;
-    padding: 0 30px;
+    @include sp {
+      padding: 10px;
+    }
+    padding: 30px;
   }
   > .pagetop {
     width: 35px;

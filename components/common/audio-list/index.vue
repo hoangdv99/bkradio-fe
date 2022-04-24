@@ -68,8 +68,14 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
+    min-height: 60vh;
   }
   > .list > .post {
+    @include sp {
+      width: 48%;
+      margin: 3px;
+      height: 125px;
+    }
     background-size: cover;
     width: 32%;
     height: 150px;
@@ -95,6 +101,9 @@ export default {
     border-radius: 15px;
   }
   > .list > .post > .overlay > .title {
+    @include sp {
+      font-size: 14px !important;
+    }
     position: absolute;
     bottom: 10px;
     text-transform: capitalize;

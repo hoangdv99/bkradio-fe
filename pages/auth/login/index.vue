@@ -67,6 +67,9 @@ export default {
   justify-content: center;
   align-items: center;
   > .form {
+    @include sp {
+      padding: 20px;
+    }
     width: 500px;
     border: 1px solid #ccc;
     border-radius: 10px;
@@ -129,7 +132,7 @@ export default {
   > .form > .btn {
     width: 100%;
     background-color: #627c83;
-    margin: 15px;
+    margin: 15px 0;
     padding: 10px;
     text-align: center;
     color: #fff;

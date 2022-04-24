@@ -30,14 +30,17 @@
         </div>
       </vue-slick-carousel>
     </div>
-    <div class="wrapper">
+    <div v-if="device === 'mobile'" class="wrapper">
+      <common-sidebar></common-sidebar>
       <div class="content">
         <div
           v-for="(audiosByType, index) in audios.audiosByTypes"
           :key="index"
           class="block-content"
         >
-          <a :href="`/tag/${audiosByType.type.slug}`" class="title">{{ audiosByType.type.name }}</a>
+          <a :href="`/tag/${audiosByType.type.slug}`" class="title">{{
+            audiosByType.type.name
+          }}</a>
           <vue-slick-carousel v-bind="settings">
             <div class="wrapped-slide">
               <div
@@ -62,7 +65,53 @@
                 class="post"
               >
                 <div class="overlay">
-                  <span class="title">{{ audio.title }} | {{ audio.author }}</span>
+                  <span class="title"
+                    >{{ audio.title }} | {{ audio.author }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </vue-slick-carousel>
+        </div>
+      </div>
+    </div>
+    <div v-else class="wrapper">
+      <div class="content">
+        <div
+          v-for="(audiosByType, index) in audios.audiosByTypes"
+          :key="index"
+          class="block-content"
+        >
+          <a :href="`/tag/${audiosByType.type.slug}`" class="title">{{
+            audiosByType.type.name
+          }}</a>
+          <vue-slick-carousel v-bind="settings">
+            <div class="wrapped-slide">
+              <div
+                v-for="audio in getFirstSlide(audiosByType.audios)"
+                :key="audio.id"
+                :style="{ backgroundImage: `url(${audio.thumbnailUrl})` }"
+                class="post"
+                @click="goToDetailPage(audio)"
+              >
+                <div class="overlay">
+                  <span class="title"
+                    >{{ audio.title }} | {{ audio.author }}</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div v-if="audiosByType.audios.length > 6" class="wrapped-slide">
+              <div
+                v-for="audio in getSecondSlide(audiosByType.audios)"
+                :key="audio.id"
+                :style="{ backgroundImage: `url(${audio.thumbnailUrl})` }"
+                class="post"
+              >
+                <div class="overlay">
+                  <span class="title"
+                    >{{ audio.title }} | {{ audio.author }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -79,6 +128,8 @@ import VueSlickCarousel from 'vue-slick-carousel'
 import 'vue-slick-carousel/dist/vue-slick-carousel.css'
 import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
 import Audios from '~/models/audios'
+import { createNamespacedHelpers } from '@/util'
+const { $get } = createNamespacedHelpers('layout')
 export default {
   name: 'IndexPage',
   components: {
@@ -95,6 +146,9 @@ export default {
         audiosByTypes: {},
       },
     }
+  },
+  computed: {
+    device: $get('device'),
   },
   async mounted() {
     this.audios = await Audios.getHomeAudios()
@@ -116,7 +170,7 @@ export default {
     },
     goToDetailPage(audio) {
       this.$router.push(`/audio/${audio.slug}`)
-    }
+    },
   },
 }
 </script>
@@ -124,9 +178,16 @@ export default {
 .index-page {
   padding-right: 3px;
   > .wrapper {
+    @include sp {
+      display: block;
+    }
+
     display: flex;
   }
   > .wrapper > .content {
+    @include sp {
+      width: 100%;
+    }
     width: 66.667%;
   }
   > .wrapper > .content > .block-content {
@@ -177,9 +238,18 @@ export default {
 
 //custom vue-slide-carousel
 .wrapped-slide {
+  @include sp {
+    justify-content: center;
+    align-items: center;
+  }
   display: flex !important;
   flex-wrap: wrap;
   > .post {
+    @include sp {
+      width: 48%;
+      height: 145px;
+    }
+
     background-size: cover;
     width: calc(33.1% - 3px);
     height: 180px;
@@ -192,6 +262,10 @@ export default {
       transform: translateY(-0.1rem);
     }
     &.-new {
+      @include sp {
+        height: 145px;
+      }
+
       height: 210px;
     }
   }
@@ -208,10 +282,14 @@ export default {
     border-radius: 15px;
   }
   > .post > .overlay > .title {
+    @include sp {
+      font-size: 16px !important;
+    }
+
     position: absolute;
     bottom: 10px;
     text-transform: capitalize;
-    font-size: 20px;
+    font-size: 20px !important;
     overflow: hidden;
     text-overflow: ellipsis;
     color: #fff;

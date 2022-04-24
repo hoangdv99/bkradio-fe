@@ -9,12 +9,14 @@
         class="content"
         @loadMore="loadMore"
       ></common-audio-list>
-      <common-sidebar></common-sidebar>
+      <common-sidebar v-if="device !== 'mobile'"></common-sidebar>
     </div>
   </div>
 </template>
 <script>
 import Audios from '@/models/audios.js'
+import { createNamespacedHelpers } from '@/util'
+const { $get } = createNamespacedHelpers('layout')
 export default {
   name: 'TopicAudioPage',
   data() {
@@ -28,6 +30,7 @@ export default {
     topic() {
       return this.audios.length ? this.audios[0].topics[0] : ''
     },
+    device: $get('device'),
   },
   async mounted() {
     const { audios, pagination } = await Audios.getAudios({
@@ -55,8 +58,14 @@ export default {
 .topic-audio-page {
   > .container {
     display: flex;
+    @include sp {
+      padding: 0;
+    }
   }
   > .container > .content {
+    @include sp {
+      width: 100%;
+    }
     width: 66.667%;
   }
 }

@@ -12,7 +12,7 @@
         auto-grow
         color="blue-grey"
       ></v-textarea>
-      <v-btn class="mx-2" fab dark small depressed color="blue-grey">
+      <v-btn class="mx-2" fab dark x-small depressed color="blue-grey">
         <v-icon dark @click="sendComment"> mdi-send </v-icon>
       </v-btn>
     </div>
@@ -205,6 +205,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .comment-block {
+  @include sp {
+    padding: 10px;
+  }
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   padding: 30px 30px 20px;
@@ -216,6 +219,10 @@ export default {
   margin-bottom: 30px;
   align-items: center;
   > .avatar {
+    @include sp {
+      width: 30px;
+      height: 30px;
+    }
     width: 40px;
     height: 40px;
     border-radius: 40px;
@@ -251,6 +258,10 @@ export default {
 .comment-content {
   display: flex;
   > .avatar {
+    @include sp {
+      width: 30px;
+      height: 30px;
+    }
     width: 40px;
     height: 40px;
     border-radius: 40px;
