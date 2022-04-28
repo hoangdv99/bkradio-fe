@@ -53,7 +53,7 @@
         />
         <ul class="sub-menu">
           <li class="list">
-            <nuxt-link to="/admin/audio" class="item">Quản lý audio</nuxt-link>
+            <nuxt-link v-if="isAdmin" to="/admin/audio" class="item">Quản lý audio</nuxt-link>
             <div class="item" @click="logout">Đăng xuất</div>
           </li>
         </ul>
@@ -65,6 +65,7 @@
 <script>
 import Audios from '@/models/audios'
 import Voices from '@/models/voices'
+import { userRole } from "~/constants"
 export default {
   name: 'AppHeader',
   data() {
@@ -78,6 +79,9 @@ export default {
     isAuthenticated() {
       return this.$store.getters.isAuthenticated
     },
+    isAdmin() {
+      return Boolean(this.$auth.user.roleId === userRole.ADMIN)
+    }
   },
   watch: {
     $route(to, from) {

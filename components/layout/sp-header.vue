@@ -1,12 +1,13 @@
 <template>
-  <v-card class="mx-auto sp-header">
-    <v-app-bar color="blue-grey" dark flat>
-      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
-      <v-toolbar-title @click="$router.push('/')">BK.RADIO</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <common-search />
-    </v-app-bar>
-
+  <div>
+    <v-card class="mx-auto sp-header">
+      <v-app-bar color="blue-grey" dark flat>
+        <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+        <v-toolbar-title @click="$router.push('/')">BK.RADIO</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <common-search />
+      </v-app-bar>
+    </v-card>
     <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list>
         <v-list-item link @click="$router.push('/')">
@@ -90,7 +91,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-  </v-card>
+  </div>
 </template>
 <script>
 import { createNamespacedHelpers } from '@/util'

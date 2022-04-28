@@ -31,14 +31,16 @@
   </div>
 </template>
 <script>
+import { createNamespacedHelpers } from '@/util'
+const { $dispatch } = createNamespacedHelpers('layout')
 export default {
   layoutContent() {
     return {
       showSidebar: false,
     }
   },
-  middleware: ['isAuthenticated'],
   name: 'LoginPage',
+  middleware: ['isAuthenticated'],
   data() {
     return {
       loginData: {
@@ -55,7 +57,13 @@ export default {
         })
         this.$router.push({ path: '/' })
       } catch (err) {
-        console.log(err)
+        if (err) {
+          $dispatch('setSnackbar', {
+            showing: true,
+            text: 'Thông tin tài khoản mật khẩu không chính xác',
+            color: 'error',
+          })
+        }
       }
     },
   },
