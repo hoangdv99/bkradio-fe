@@ -54,7 +54,7 @@
         <ul class="sub-menu">
           <li class="list">
             <nuxt-link v-if="isAdmin" to="/admin/audio" class="item">Quản lý audio</nuxt-link>
-            <div class="item" @click="logout">Đăng xuất</div>
+            <div class="item" @click="logout">Đăng xuất ({{ $auth.user.username }})</div>
           </li>
         </ul>
       </div>

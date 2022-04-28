@@ -39,7 +39,7 @@ export default class Audios {
   }
 
   static async getAudioBySlug(slug) {
-    return await apis.audioApi.get(`audios/${slug}`).json()
+    return await apis.audioApi.get(`audios/slug/${slug}`).json()
   }
 
   static async updateAudio(audio) {

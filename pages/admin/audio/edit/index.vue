@@ -135,12 +135,6 @@ export default {
   layoutContent() {
     return {
       showSidebar: false,
-      breadcrumbs: [
-        {
-          name: 'Chỉnh sửa audio',
-          url: '#',
-        },
-      ],
     }
   },
   middleware: ['isAuthenticated', 'isAdmin'],
