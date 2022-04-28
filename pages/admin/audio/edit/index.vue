@@ -143,6 +143,7 @@ export default {
       ],
     }
   },
+  middleware: ['isAuthenticated', 'isAdmin'],
   data() {
     return {
       audio: {
@@ -172,11 +173,7 @@ export default {
   computed: {
     voices: $get('voices'),
     formIsValid() {
-      return (
-        !this.isUploading &&
-        this.audio.title &&
-        this.audio.voiceId
-      )
+      return !this.isUploading && this.audio.title && this.audio.voiceId
     },
   },
   async mounted() {

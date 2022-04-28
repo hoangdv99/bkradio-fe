@@ -7,7 +7,7 @@
           <nuxt-link to="/" class="link">Trang chủ</nuxt-link>
         </li>
         <li ref="topic" class="item">
-          <div href="" class="link -dropdown">Thể loại</div>
+          <div class="link -dropdown">Thể loại</div>
           <ul class="sub-menu">
             <li class="list">
               <nuxt-link
@@ -21,7 +21,7 @@
           </ul>
         </li>
         <li ref="voice" class="item">
-          <a href="" class="link -dropdown">Giọng đọc</a>
+          <div class="link -dropdown">Giọng đọc</div>
           <ul class="sub-menu -voices">
             <li class="list">
               <nuxt-link

@@ -45,6 +45,7 @@ import { createNamespacedHelpers } from '@/util'
 const { $dispatch } = createNamespacedHelpers('layout')
 export default {
   name: 'LoginPage',
+  middleware: ['isAuthenticated'],
   data() {
     return {
       signupData: {

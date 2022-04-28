@@ -37,6 +37,7 @@ export default {
       showSidebar: false,
     }
   },
+  middleware: ['isAuthenticated'],
   name: 'LoginPage',
   data() {
     return {
