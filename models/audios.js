@@ -50,10 +50,11 @@ export default class Audios {
     return await apis.audioApi.delete(`audios/${id}`)
   }
 
-  static async updateRating(audioId, rating) {
+  static async updateRating(audioId, userId, rating) {
     return await apis.audioApi.patch(`audios/${audioId}`, {
       json: {
         audioId,
+        userId,
         rating
       }
     })

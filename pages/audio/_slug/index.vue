@@ -151,12 +151,14 @@ export default {
   },
   methods: {
     async updateRating() {
-      await Audios.updateRating(
-        this.audio.id,
-        this.$auth.user.userId,
-        this.audio.rating
-      )
-      this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+      try {
+        await Audios.updateRating(
+          this.audio.id,
+          this.$auth.user.userId,
+          this.audio.rating
+        )
+        this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+      } catch (error) { throw error }
     },
     async saveHistory() {
       const currentPlayingTime = this.$refs.player?.currentTime
