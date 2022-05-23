@@ -8,7 +8,7 @@
         <common-search />
       </v-app-bar>
     </v-card>
-    <v-navigation-drawer v-model="drawer" absolute temporary>
+    <v-navigation-drawer v-model="drawer" absolute temporary app>
       <v-list>
         <v-list-item link @click="$router.push('/')">
           <v-list-item-icon>
