@@ -38,9 +38,9 @@
           :key="index"
           class="block-content"
         >
-          <a :href="`/tag/${audiosByType.type.slug}`" class="title">{{
+          <nuxt-link :to="`/audio/type/${audiosByType.type.slug}`" class="title">{{
             audiosByType.type.name
-          }}</a>
+          }}</nuxt-link>
           <vue-slick-carousel v-bind="settings">
             <div class="wrapped-slide">
               <div
@@ -82,9 +82,9 @@
           :key="index"
           class="block-content"
         >
-          <a :href="`/tag/${audiosByType.type.slug}`" class="title">{{
+          <nuxt-link v-if="audiosByType.audios.length" :to="`/audio/type/${audiosByType.type.slug}`" class="title">{{
             audiosByType.type.name
-          }}</a>
+          }}</nuxt-link>
           <vue-slick-carousel v-bind="settings">
             <div class="wrapped-slide">
               <div

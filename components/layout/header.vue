@@ -6,6 +6,15 @@
         <li ref="home" class="item -active">
           <nuxt-link to="/" class="link">Trang chủ</nuxt-link>
         </li>
+        <li ref="shortStories" class="item">
+          <nuxt-link to="/audio/type/truyen-ngan" class="link">Truyện ngắn</nuxt-link>
+        </li>
+        <li ref="longStories" class="item">
+          <nuxt-link to="/audio/type/truyen-dai" class="link">Truyện dài</nuxt-link>
+        </li>
+        <li ref="book" class="item">
+          <nuxt-link to="/audio/type/sach-noi" class="link">Sách nói</nuxt-link>
+        </li>
         <li ref="topic" class="item">
           <div class="link -dropdown">Thể loại</div>
           <ul class="sub-menu">
@@ -87,19 +96,22 @@ export default {
     $route(to, from) {
       switch (to.name) {
         case 'index':
-          this.$refs.home.classList.add('-active')
-          this.$refs.topic.classList.remove('-active')
-          this.$refs.voice.classList.remove('-active')
+          this.activeTab('home')
           break
         case 'topic-slug':
-          this.$refs.topic.classList.add('-active')
-          this.$refs.home.classList.remove('-active')
-          this.$refs.voice.classList.remove('-active')
+          this.activeTab('topic')
           break
         case 'voice-slug':
-          this.$refs.voice.classList.add('-active')
-          this.$refs.home.classList.remove('-active')
-          this.$refs.topic.classList.remove('-active')
+          this.activeTab('voice')
+          break
+        case 'audio-type-slug':
+          if (to.params.slug === 'truyen-ngan') {
+            this.activeTab('shortStories')
+          } else if (to.params.slug === 'truyen-dai') {
+            this.activeTab('longStories')
+          } else if (to.params.slug === 'sach-noi') {
+            this.activeTab('book')
+          }
           break
         default:
           break
@@ -116,6 +128,19 @@ export default {
     async logout() {
       await this.$auth.logout()
     },
+    activeTab(tab) {
+      const tabs = [
+        'home',
+        'voice',
+        'topic',
+        'shortStories',
+        'longStories',
+        'book'
+      ]
+      tabs.splice(tabs.indexOf(tab), 1)
+      this.$refs[tab].classList.add('-active')
+      tabs.forEach(unactiveTab => this.$refs[unactiveTab].classList.remove('-active'))
+    }
   },
 }
 </script>
