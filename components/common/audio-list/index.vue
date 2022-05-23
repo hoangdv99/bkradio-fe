@@ -1,6 +1,7 @@
 <template>
   <div class="audio-list">
     <h1 class="header">{{ title }}</h1>
+    <p v-if="!audios.length" class="text-center text-h5">Nội dung bạn muốn tìm không tồn tại.</p>
     <div class="list">
       <div
         v-for="audio in audios"
