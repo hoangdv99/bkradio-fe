@@ -38,7 +38,7 @@
           :key="index"
           class="block-content"
         >
-          <nuxt-link :to="`/audio/type/${audiosByType.type.slug}`" class="title">{{
+          <nuxt-link v-if="audiosByType.audios.length" :to="`/audio/type/${audiosByType.type.slug}`" class="title">{{
             audiosByType.type.name
           }}</nuxt-link>
           <vue-slick-carousel v-bind="settings">

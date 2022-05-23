@@ -109,7 +109,9 @@ export default {
     z-index: 999;
     @include sp {
       top: 50px;
-      left: 10px;
+      left: 0;
+      right: 0;
+      margin: auto;
     }
   }
 }
