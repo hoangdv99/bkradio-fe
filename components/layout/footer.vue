@@ -1,7 +1,7 @@
 <template>
   <footer class="app-footer">
     <div class="text">
-      © Copyright 2022 BKRadio | Thư Viện Audio Dành Cho Mọi Người
+      BKRadio | Thư Viện Audio Dành Cho Mọi Người
     </div>
     <ul class="menu">
       <nuxt-link

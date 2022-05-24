@@ -76,7 +76,7 @@
             <v-list-item-title>Tài khoản</v-list-item-title>
           </template>
           <v-list-item link class="ml-14" @click="$auth.logout()">
-            <v-list-item-title v-text="'Đăng xuất'"></v-list-item-title>
+            <v-list-item-title v-text="`Đăng xuất (${$auth.user.username})`"></v-list-item-title>
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
