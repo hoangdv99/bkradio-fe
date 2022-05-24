@@ -69,7 +69,6 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    min-height: 60vh;
   }
   > .list > .post {
     @include sp {

@@ -66,24 +66,17 @@
               class="tag"
               >#{{ topic }}</nuxt-link
             >
-            <nuxt-link v-if="audio.voice !== 'Unknown'" :to="genVoiceTagLink()" class="tag"
+            <nuxt-link
+              v-if="audio.voice !== 'Unknown'"
+              :to="genVoiceTagLink()"
+              class="tag"
               >#{{ audio.voice }}</nuxt-link
             >
           </div>
         </div>
         <div class="related-posts">
           <h3 class="title">Có thể bạn quan tâm...</h3>
-          <ul class="list">
-            <nuxt-link
-              v-for="relatedAudio in audio.relatedAudios"
-              :key="relatedAudio.id"
-              :to="`/audio/${audio.slug}`"
-              class="post"
-            >
-              <img :src="audio.thumbnailUrl" alt="post" class="thumbnail" />
-              {{ audio.title }} | {{ audio.author }}
-            </nuxt-link>
-          </ul>
+          <common-audio-list :audios="audio.relatedAudios"></common-audio-list>
         </div>
         <comment-block
           :audio-id="audio.id"
@@ -197,7 +190,7 @@ export default {
     },
     genVoiceTagLink() {
       return `/voice/${slugify(this.audio.voice, { lower: false })}`
-    }
+    },
   },
 }
 </script>
@@ -394,36 +387,6 @@ export default {
       -ms-transform: skew(-40deg) translateX(14px);
       transform: skew(-40deg) translateX(14px);
       z-index: -1;
-    }
-  }
-  > .list {
-    display: flex;
-    flex-flow: wrap;
-    padding: 0;
-  }
-  > .list > .post {
-    @include sp {
-      margin: 0 5px 5px;
-      width: 29%;
-      font-size: 13px !important;
-    }
-    width: 30%;
-    margin: 0 10px 10px;
-    font-size: 14px !important;
-    line-height: 19px;
-    color: #2c2f34;
-    font-weight: 600;
-    &:hover {
-      color: #9ebaa0;
-      transform: 0.15s;
-      opacity: 0.8;
-    }
-  }
-  > .list > .post > .thumbnail {
-    border-radius: 15px;
-    @include sp {
-      border-radius: 10px;
-      height: 80px;
     }
   }
 }
