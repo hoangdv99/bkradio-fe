@@ -199,6 +199,7 @@ export default {
       })
       this.comments = comments
       this.totalCommentPage = pagination.lastPage
+      this.$emit('setCommentsAmount', pagination.total)
     },
   },
 }

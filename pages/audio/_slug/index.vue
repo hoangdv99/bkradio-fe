@@ -15,7 +15,7 @@
             <div class="statistic">
               <div class="comment">
                 <v-icon small>mdi-comment</v-icon>
-                <span class="text">0</span>
+                <span class="text">{{ commentAmount }}</span>
               </div>
               <div class="view">
                 <v-icon small>mdi-eye</v-icon>
@@ -83,7 +83,10 @@
             </nuxt-link>
           </ul>
         </div>
-        <comment-block :audio-id="audio.id"></comment-block>
+        <comment-block
+          :audio-id="audio.id"
+          @setCommentsAmount="setCommentsAmount"
+        ></comment-block>
       </div>
       <v-dialog v-model="dialog" persistent max-width="350">
         <v-card>
@@ -130,6 +133,7 @@ export default {
     return {
       audio: null,
       dialog: false,
+      commentAmount: 0,
     }
   },
   computed: {
@@ -151,14 +155,12 @@ export default {
   },
   methods: {
     async updateRating() {
-      try {
-        await Audios.updateRating(
-          this.audio.id,
-          this.$auth.user.userId,
-          this.audio.rating
-        )
-        this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
-      } catch (error) { throw error }
+      await Audios.updateRating(
+        this.audio.id,
+        this.$auth.user.userId,
+        this.audio.rating
+      )
+      this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
     },
     async saveHistory() {
       const currentPlayingTime = this.$refs.player?.currentTime
@@ -183,6 +185,9 @@ export default {
       this.dialog = false
       this.$refs.player.currentTime = this.audio.history
       this.$refs.player.play()
+    },
+    setCommentsAmount(number) {
+      this.commentAmount = number
     },
   },
 }
