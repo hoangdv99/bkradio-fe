@@ -59,14 +59,16 @@
             chọn
           </div>
           <div class="tags">
-            <a
+            <nuxt-link
               v-for="(topic, index) in audio.topics"
               :key="index"
-              href="#"
+              :to="genTopicTagLink(topic)"
               class="tag"
-              >#{{ topic }}</a
+              >#{{ topic }}</nuxt-link
             >
-            <a href="#" class="tag">#Hem radio</a>
+            <nuxt-link v-if="audio.voice !== 'Unknown'" :to="genVoiceTagLink()" class="tag"
+              >#{{ audio.voice }}</nuxt-link
+            >
           </div>
         </div>
         <div class="related-posts">
@@ -115,6 +117,7 @@
   </div>
 </template>
 <script>
+import slugify from 'slugify'
 import CommentBlock from './-comment.vue'
 import Audios from '@/models/audios'
 import { createNamespacedHelpers } from '@/util'
@@ -189,6 +192,12 @@ export default {
     setCommentsAmount(number) {
       this.commentAmount = number
     },
+    genTopicTagLink(topic) {
+      return `/topic/${slugify(topic, { lower: true })}`
+    },
+    genVoiceTagLink() {
+      return `/voice/${slugify(this.audio.voice, { lower: false })}`
+    }
   },
 }
 </script>
