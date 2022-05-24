@@ -91,7 +91,7 @@ export default {
     color: #fff;
     right: 15px;
     border-radius: 35px;
-    z-index: 3;
+    z-index: 1000;
     transition: 0.3s;
     cursor: pointer;
     &.-hide {
