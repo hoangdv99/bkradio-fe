@@ -1,5 +1,6 @@
 <template>
   <div class="comment-block">
+    <h3 class="title">Bình luận</h3>
     <div v-if="$auth.loggedIn" class="comment-input">
       <img
         src="https://secure.gravatar.com/avatar/2095bd5cedab25e46d4eb8eb40cc4a2b?s=64&d=mm&r=g"
@@ -158,7 +159,7 @@ export default {
       await this.getComments()
     },
     async sendReply(commentId) {
-      await Comments.saveComment({
+      const reply = await Comments.saveComment({
         audioId: this.audioId,
         userId: this.$auth.user.userId,
         content: this.replyInput,
@@ -166,11 +167,11 @@ export default {
         parentCommentId: commentId,
       })
       this.replyInput = null
-      await this.getComments()
       const currentComment = this.comments.find(
         (comment) => comment.id === commentId
       )
       currentComment.showReplies = true
+      currentComment.replies.unshift(reply)
     },
     convertTime(time) {
       return moment(time).fromNow()
@@ -214,6 +215,44 @@ export default {
   padding: 30px 30px 20px;
   margin-bottom: 30px;
   height: auto;
+  > .title {
+    @include sp {
+      font-size: 16px !important;
+    }
+    position: relative;
+    opacity: 0.99;
+    display: inline-block !important;
+    width: auto;
+    font-size: 18px;
+    line-height: 1.3;
+    font-weight: 500;
+    margin-bottom: 20px;
+    padding: 5px 10px;
+    color: #fff;
+    background-color: #9ebaa0;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 70%;
+      height: 100%;
+      background-color: #9ebaa0;
+      -webkit-transform: skew(-40deg) translateX(14px);
+      -ms-transform: skew(-40deg) translateX(14px);
+      transform: skew(-40deg) translateX(14px);
+      z-index: -1;
+    }
+  }
 }
 .comment-input {
   display: flex;

@@ -8,7 +8,7 @@ export default class Audios {
   }
 
   static async saveComment(body) {
-    return await apis.audioApi.post('comments', { json: body })
+    return await apis.audioApi.post('comments', { json: body }).json()
   }
 
   static async getComments(searchParams) {
