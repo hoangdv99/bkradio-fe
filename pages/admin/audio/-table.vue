@@ -1,5 +1,14 @@
 <template>
   <div>
+    <v-col cols="12" sm="8">
+      <v-text-field
+        v-model="keyword"
+        label="Tìm kiếm"
+        prepend-inner-icon="mdi-magnify"
+        color="blue-grey"
+        @input="search"
+      ></v-text-field>
+    </v-col>
     <v-data-table :headers="headers" :items="audios" hide-default-footer>
       <template #[`item.audioDescription`]="{ item }">
         <div class="d-flex align-center pt-1 pb-1 audio-info">
@@ -89,6 +98,8 @@ export default {
       page: 1,
       totalPages: 0,
       lastPage: 0,
+      timeout: null,
+      keyword: '',
     }
   },
   computed: {
@@ -142,6 +153,15 @@ export default {
       this.audios = audios
       this.lastPage = pagination.lastPage
     },
+    search() {
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(async () => {
+        const { audios } = await Audios.getAudios({
+          searchKeyword: this.keyword,
+        })
+        this.audios = audios
+      }, 500)
+    },
   },
 }
 const headers = [
@@ -164,13 +184,6 @@ const headers = [
     sortable: true,
     width: 120,
     sort: (a, b) => a - b,
-    align: 'center',
-  },
-  {
-    text: 'Bình luận',
-    value: 'comment',
-    width: 120,
-    sortable: true,
     align: 'center',
   },
   {
