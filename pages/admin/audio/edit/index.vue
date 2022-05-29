@@ -60,7 +60,17 @@
             required
           ></v-autocomplete>
         </div>
-        <v-col>
+        <v-col class="d-flex pt-0" cols="12" sm="6">
+          <v-select
+            v-model="audio.type"
+            :items="types"
+            item-text="label"
+            item-value="value"
+            label="Thể loại"
+            outlined
+          ></v-select>
+        </v-col>
+        <v-col class="pt-0">
           <v-text-field
             v-model="audio.author"
             label="Tác giả"
@@ -81,7 +91,7 @@
             outlined
             required
           ></v-autocomplete>
-          <new-voice-popup class="mt-0"></new-voice-popup>
+          <new-voice-popup class="mt-0 ml-2"></new-voice-popup>
         </v-col>
       </v-col>
       <v-col cols="4" class="audio-section pt-5">
@@ -126,9 +136,11 @@
 </template>
 <script>
 import { createNamespacedHelpers } from '~/util'
+import newVoicePopup from '@/pages/admin/audio/-@newVoicePopup.vue'
+import firebaseStorage from '~/mixins/firebaseStorage'
 import Audios from '@/models/audios'
-const { $get, $dispatch } = createNamespacedHelpers('audios')
-const layoutNamespaceHelpers = createNamespacedHelpers('layout')
+const { $get, $dispatch } = createNamespacedHelpers('admin')
+const layoutHelper = createNamespacedHelpers('layout')
 
 export default {
   name: 'EditPage',
@@ -137,9 +149,24 @@ export default {
       showSidebar: false,
     }
   },
+  components: {
+    newVoicePopup,
+  },
+  mixins: [firebaseStorage],
   middleware: ['isAuthenticated', 'isAdmin'],
   data() {
     return {
+      thumbnail: null,
+      isSelecting: false,
+      rules: {
+        title: [(value) => !!value || 'Tiêu đề không được bỏ trống'],
+        author: [(value) => !!value || 'Tác giả không được bỏ trống'],
+        topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
+      },
+      statuses: [
+        { value: 1, label: 'Công khai' },
+        { value: 2, label: 'Riêng tư' },
+      ],
       audio: {
         title: null,
         description: null,
@@ -148,66 +175,66 @@ export default {
         thumbnailUrl: null,
         url: null,
         topicIds: [],
+        type: 1,
       },
-      thumbnail: null,
-      isSelecting: false,
-      topics: [],
-      rules: {
-        title: [(value) => !!value || 'Tiêu đề không được bỏ trống'],
-        author: [(value) => !!value || 'Tác giả không được bỏ trống'],
-        voice: [(value) => !!value || 'Giọng đọc không được bỏ trống'],
-        topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
-      },
-      statuses: [
-        { value: 1, label: 'Công khai' },
-        { value: 2, label: 'Riêng tư' },
+      types: [
+        { value: 1, label: 'Truyện ngắn' },
+        { value: 2, label: 'Truyện dài' },
+        { value: 3, label: 'Sách nói' },
+        { value: 4, label: 'Podcast' },
       ],
     }
   },
   computed: {
     voices: $get('voices'),
+    topics: $get('topics'),
     formIsValid() {
-      return !this.isUploading && this.audio.title && this.audio.voiceId
+      return !this.isUploading && this.audio.title
     },
   },
   async mounted() {
-    if (!this.voices.length) await $dispatch('getVoices')
+    if (!this.voices.length) $dispatch('getVoices')
+    if (!this.topics.length) $dispatch('getTopics')
     this.audio = await Audios.getAudio(this.$route.query.audioId)
-    this.topics = await Audios.getTopics()
   },
   methods: {
     async save() {
       if (this.formIsValid) {
-        const result = await Audios.updateAudio({
-          id: this.audio.id,
-          title: this.audio.title,
-          description: this.audio.description,
-          author: this.audio.author,
-          voiceId: this.audio.voiceId,
-          thumbnailUrl: this.audio.thumbnailUrl,
-          topicIds: this.audio.topicIds,
-          status: this.audio.status,
-        })
-        if (result.status === 200) {
-          layoutNamespaceHelpers.$dispatch('setSnackbar', {
+        if (this.thumbnail) {
+          const { link } = await this.uploadSingleFile(
+            'thumbnails',
+            this.thumbnail
+          )
+          this.audio.thumbnailUrl = link
+        }
+        try {
+          await Audios.updateAudio(this.audio)
+          layoutHelper.$dispatch('setSnackbar', {
             showing: true,
             text: 'Chỉnh sửa audio thành công',
             color: 'success',
           })
-          await $dispatch('getAudios')
-        } else {
-          layoutNamespaceHelpers.$dispatch('setSnackbar', {
+          $dispatch('getAudios')
+        } catch (err) {
+          layoutHelper.$dispatch('setSnackbar', {
             showing: true,
-            text: 'Có lỗi xảy ra',
+            text: err.message,
             color: 'error',
           })
         }
       }
     },
-    async onThumbnailChanged(e) {
+    onThumbnailChanged(e) {
       this.thumbnail = e.target.files[0]
+      if (!this.thumbnail.type.match('image.*')) {
+        this.thumbnail = null
+        return layoutHelper.$dispatch('setSnackbar', {
+          showing: true,
+          text: 'Sai định dạng file',
+          color: 'error',
+        })
+      }
       this.audio.thumbnailUrl = URL.createObjectURL(this.thumbnail)
-      await this.uploadThumbnail()
     },
     onUploadBtnClick() {
       this.isSelecting = true
@@ -219,17 +246,6 @@ export default {
         { once: true }
       )
       this.$refs.uploader.click()
-    },
-    generateUniqueFileName(fileName) {
-      return Math.floor(Date.now() + Math.random()) + '_' + fileName
-    },
-    async uploadThumbnail() {
-      const { signedUrl, fileUrl } = await Audios.getS3PresignedUrl({
-        fileName: this.generateUniqueFileName(this.thumbnail.name),
-        fileType: 'image',
-      })
-      await Audios.uploadToS3(signedUrl, this.thumbnail)
-      this.audio.thumbnailUrl = fileUrl
     },
   },
 }

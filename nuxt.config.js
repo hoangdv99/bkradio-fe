@@ -1,4 +1,4 @@
-import { i18n } from './config'
+import { i18n, firebase } from './config'
 
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -57,6 +57,7 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
     ['nuxt-i18n', i18n],
+    ['@nuxtjs/firebase', firebase()],
   ],
 
   auth: {

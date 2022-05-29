@@ -82,7 +82,17 @@
                   required
                 ></v-autocomplete>
               </div>
-              <v-col full-width>
+              <v-col class="d-flex pt-0" cols="12" sm="6">
+                <v-select
+                  v-model="audio.type"
+                  :items="types"
+                  item-text="label"
+                  item-value="value"
+                  label="Thể loại"
+                  outlined
+                ></v-select>
+              </v-col>
+              <v-col class="pt-0" full-width>
                 <v-text-field
                   v-model="audio.author"
                   :rules="rules.author"
@@ -121,7 +131,10 @@
               >
                 <v-img
                   :lazy-src="require('@/assets/images/no-photo.png')"
-                  :src="audio.thumbnailUrl || require('@/assets/images/no-photo.png')"
+                  :src="
+                    audio.thumbnailUrl ||
+                    require('@/assets/images/no-photo.png')
+                  "
                   width="100%"
                   class="mb-2"
                 ></v-img>
@@ -167,14 +180,16 @@
 <script>
 import NewVoicePopup from './-@newVoicePopup.vue'
 import { createNamespacedHelpers } from '~/util'
-import Audios from '@/models/audios'
-const { $get, $dispatch } = createNamespacedHelpers('audios')
+import firebaseStorage from '~/mixins/firebaseStorage'
+const { $get, $dispatch } = createNamespacedHelpers('admin')
+const layoutHelper = createNamespacedHelpers('layout')
 
 export default {
   name: 'UploadButton',
   components: {
     NewVoicePopup,
   },
+  mixins: [firebaseStorage],
   data() {
     return {
       dialog: false,
@@ -184,35 +199,37 @@ export default {
       rules: {
         title: [(value) => !!value || 'Tiêu đề không được bỏ trống'],
         author: [(value) => !!value || 'Tác giả không được bỏ trống'],
-        voice: [(value) => !!value || 'Giọng đọc không được bỏ trống'],
         topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
       },
       audio: {
         title: null,
         description: null,
         author: null,
-        voiceId: null,
+        voiceId: 0,
         thumbnailUrl: null,
         audioUrl: null,
         topicIds: [],
+        type: 1,
       },
       thumbnail: null,
+      types: [
+        { value: 1, label: 'Truyện ngắn' },
+        { value: 2, label: 'Truyện dài' },
+        { value: 3, label: 'Sách nói' },
+        { value: 4, label: 'Podcast' },
+      ],
     }
   },
   computed: {
     voices: $get('voices'),
+    topics: $get('topics'),
     formIsValid() {
-      return (
-        !this.isUploading &&
-        this.audio.title &&
-        this.audio.author &&
-        this.audio.voiceId
-      )
+      return !this.isUploading && this.audio.title && this.audio.author
     },
   },
-  async mounted() {
+  mounted() {
     if (!this.voices.length) $dispatch('getVoices')
-    this.topics = await Audios.getTopics()
+    if (!this.topics.length) $dispatch('getTopics')
   },
   methods: {
     onUploadBtnClick() {
@@ -229,37 +246,58 @@ export default {
     },
     async onAudioChanged(e) {
       this.selectedFile = e.target.files[0]
+      if (!this.selectedFile.type.match('audio.*')) {
+        this.selectedFile = null
+        return layoutHelper.$dispatch('setSnackbar', {
+          showing: true,
+          text: 'Sai định dạng file',
+          color: 'error',
+        })
+      }
       this.audio.title = this.selectedFile.name.replace(/\.[^/.]+$/, '')
-      const { signedUrl, fileUrl } = await Audios.getS3PresignedUrl({
-        fileName: this.generateUniqueFileName(this.selectedFile.name),
-        fileType: 'audio',
-      })
-      this.audio.audioUrl = fileUrl
       this.isUploading = true
-      await Audios.uploadToS3(signedUrl, this.selectedFile)
+      const { link } = await this.uploadSingleFile('audio', this.selectedFile)
+      this.audio.audioUrl = link
       this.isUploading = false
     },
-    async onThumbnailChanged(e) {
+    onThumbnailChanged(e) {
       this.thumbnail = e.target.files[0]
+      if (!this.thumbnail.type.match('image.*')) {
+        this.thumbnail = null
+        return layoutHelper.$dispatch('setSnackbar', {
+          showing: true,
+          text: 'Sai định dạng file',
+          color: 'error',
+        })
+      }
       this.audio.thumbnailUrl = URL.createObjectURL(this.thumbnail)
-      await this.uploadThumbnail()
     },
     async save() {
-      if (this.thumbnail) await this.uploadThumbnail()
-      $dispatch('createNewAudio', {
-        ...this.audio,
-        userId: this.$auth.user.userId,
-      })
-      $dispatch('getAudios')
-      this.audio = {
-        title: null,
-        description: null,
-        author: null,
-        voiceId: null,
-        thumbnailUrl: null,
-        audioUrl: null,
+      if (this.thumbnail) {
+        const { link } = await this.uploadSingleFile(
+          'thumbnails',
+          this.thumbnail
+        )
+        this.audio.thumbnailUrl = link
       }
-      this.dialog = false
+      if (
+        await $dispatch('createNewAudio', {
+          ...this.audio,
+          userId: this.$auth.user.userId,
+        })
+      ) {
+        this.audio = {
+          title: null,
+          description: null,
+          author: null,
+          voiceId: null,
+          thumbnailUrl: null,
+          audioUrl: null,
+        }
+        this.selectedFile = null
+        this.thumbnail = null
+        this.dialog = false
+      }
     },
     close() {
       this.audio = {
@@ -271,18 +309,8 @@ export default {
         audioUrl: null,
       }
       this.selectedFile = null
+      this.thumbnail = null
       this.dialog = false
-    },
-    generateUniqueFileName(fileName) {
-      return Math.floor(Date.now() + Math.random()) + '_' + fileName
-    },
-    async uploadThumbnail() {
-      const { signedUrl, fileUrl } = await Audios.getS3PresignedUrl({
-        fileName: this.generateUniqueFileName(this.thumbnail.name),
-        fileType: 'image',
-      })
-      this.audio.thumbnailUrl = fileUrl
-      await Audios.uploadToS3(signedUrl, this.thumbnail)
     },
   },
 }

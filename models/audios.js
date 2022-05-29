@@ -1,4 +1,3 @@
-import ky from "ky-universal"
 import { apis } from "~/apis"
 
 export default class Audios {
@@ -8,13 +7,11 @@ export default class Audios {
     })
   }
 
-  static async getS3PresignedUrl({ fileName, fileType }) {
-    return await apis.audioApi.get(`sign-s3?fileName=${fileName}&fileType=${fileType}`).json()
-  }
-
-  static async uploadToS3(signedUrl, file) {
-    return await ky.put(signedUrl, {
-      body: file
+  static async uploadFile(formData) {
+    return await apis.audioApi.post('audios/upload', {
+      json: {
+        aud: 'lol'
+      }
     })
   }
 
@@ -23,7 +20,7 @@ export default class Audios {
   }
 
   static async create(audio) {
-    return await apis.audioApi.post('audios', { json: audio })
+    return await apis.audioApi.post('audios', { json: audio }).json()
   }
 
   static async getAudios(searchParams) {

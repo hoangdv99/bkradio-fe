@@ -7,8 +7,11 @@ const { $dispatch } = createNamespacedHelpers('layout')
 export const state = () => ({
   authors: [],
   voices: [],
-  audios: [],
   topics: [],
+  audios: [],
+  perPage: 10,
+  page: 1,
+  lastPage: 0
 })
 
 export const mutations = {
@@ -20,7 +23,7 @@ export const getters = {
 }
 
 export const actions = {
-  async createNewAudio({ commit }, audio) {
+  async createNewAudio({ commit, dispatch }, audio) {
     try {
       const newAudio = await Audios.create(audio)
       $dispatch('setSnackbar', {
@@ -28,6 +31,7 @@ export const actions = {
         text: 'Thêm audio mới thành công',
         color: 'success'
       })
+      dispatch('getAudios')
       return newAudio
     } catch (error) {
       $dispatch('setSnackbar', {
@@ -37,23 +41,28 @@ export const actions = {
       })
     }
   },
-  async getAudios({ commit }) {
-    const audios = await Audios.getAudios()
+  async getAudios({ commit, state }) {
+    const { audios, pagination } = await Audios.getAudios({
+      page: state.page,
+      perPage: state.perPage,
+      allViewMode: true,
+    })
     commit('SET_AUDIOS', audios)
+    commit('SET_LAST_PAGE', pagination.lastPage)
   },
   async getVoices({ commit }) {
     const voices = await Voices.getVoices()
     commit('SET_VOICES', voices)
   },
-  async createNewVoice({ commit }, voice) {
+  async createNewVoice({ commit, dispatch }, voice) {
     try {
       await Voices.create(voice)
-      commit('ADD_VOICE', voice)
       $dispatch('setSnackbar', {
         showing: true,
         text: 'Thêm mới giọng đọc thành công',
         color: 'success'
       })
+      dispatch('getVoices')
     } catch (error) {
       $dispatch('setSnackbar', {
         showing: true,
@@ -65,5 +74,36 @@ export const actions = {
   async getTopics({ commit }) {
     const topics = await Audios.getTopics()
     commit('SET_TOPICS', topics)
+  },
+  async pageChange({ commit, state }, value) {
+    commit('SET_PAGE', value)
+    const { audios } = await Audios.getAudios({
+      page: state.page,
+      perPage: state.perPage
+    })
+    commit('SET_AUDIOS', audios)
+  },
+  async search({ commit }, keyword) {
+    const { audios } = await Audios.getAudios({
+      searchKeyword: keyword
+    })
+    commit('SET_AUDIOS', audios)
+  },
+  async deleteAudio({ commit, dispatch }, id) {
+    try {
+      await Audios.deleteAudio(id)
+      $dispatch('setSnackbar', {
+        showing: true,
+        text: 'Xóa audio thành công',
+        color: 'success'
+      })
+      dispatch('getAudios')
+    } catch(err) {
+      $dispatch('setSnackbar', {
+        showing: true,
+        text: err.message,
+        color: 'error'
+      })
+    }
   },
 }

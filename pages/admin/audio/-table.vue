@@ -84,32 +84,29 @@
   </div>
 </template>
 <script>
-import Audios from '@/models/audios'
 import { createNamespacedHelpers } from '~/util'
-const layoutNamespaceHelpers = createNamespacedHelpers('layout')
+const adminAudioHelpers = createNamespacedHelpers('admin')
 
 export default {
   name: 'AudioList',
   data() {
     return {
       headers,
-      audios: [],
-      perPage: 10,
-      page: 1,
-      totalPages: 0,
-      lastPage: 0,
       timeout: null,
       keyword: '',
+      page: 1,
     }
   },
   computed: {
+    audios: adminAudioHelpers.$get('audios'),
+    lastPage: adminAudioHelpers.$get('lastPage'),
     heightCard() {
       const { top, bar } = this.$vuetify.application
       return `calc(100vh - ${top + bar}px - 200px)`
     },
   },
-  async mounted() {
-    await this.getAudios()
+  mounted() {
+    if (!this.audios.length) adminAudioHelpers.$dispatch('getAudios')
   },
   methods: {
     convertStatus(status) {
@@ -122,44 +119,18 @@ export default {
     goToDetailPage(slug) {
       window.open(`/audio/${slug}`, '_blank')
     },
-    async deleteAudio(id) {
-      try {
-        if (confirm('Bạn có chắc chắn muốn xóa audio này không?')) {
-          await Audios.deleteAudio(id)
-          layoutNamespaceHelpers.$dispatch('setSnackbar', {
-            showing: true,
-            text: 'Xóa audio thành công',
-            color: 'success',
-          })
-          this.audios = await Audios.getAudios({})
-        }
-      } catch (error) {
-        layoutNamespaceHelpers.$dispatch('setSnackbar', {
-          showing: true,
-          text: 'Có lỗi xảy ra',
-          color: 'error',
-        })
+    deleteAudio(id) {
+      if (confirm('Bạn có chắc chắn muốn xóa audio này không?')) {
+        adminAudioHelpers.$dispatch('deleteAudio', id)
       }
     },
     handlePageChange(value) {
-      this.page = value
-      this.getAudios()
-    },
-    async getAudios() {
-      const { audios, pagination } = await Audios.getAudios({
-        page: this.page,
-        perPage: this.perPage,
-      })
-      this.audios = audios
-      this.lastPage = pagination.lastPage
+      adminAudioHelpers.$dispatch('pageChange', value)
     },
     search() {
       clearTimeout(this.timeout)
-      this.timeout = setTimeout(async () => {
-        const { audios } = await Audios.getAudios({
-          searchKeyword: this.keyword,
-        })
-        this.audios = audios
+      this.timeout = setTimeout(() => {
+        adminAudioHelpers.$dispatch('search', this.keyword)
       }, 500)
     },
   },

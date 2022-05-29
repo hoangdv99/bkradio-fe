@@ -40,7 +40,7 @@
 </template>
 <script>
 import { createNamespacedHelpers } from '~/util'
-const { $dispatch } = createNamespacedHelpers('audios')
+const { $dispatch } = createNamespacedHelpers('admin')
 
 export default {
   name: 'NewVoicePopup',

@@ -139,10 +139,14 @@ export default {
     window.addEventListener('beforeunload', this.saveHistory)
   },
   async mounted() {
-    this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
-    await Audios.updateView(this.audio.id)
-    if (this.audio.history && this.audio.history > 0) {
-      this.dialog = true
+    try {
+      this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+      await Audios.updateView(this.audio.id)
+      if (this.audio.history && this.audio.history > 0) {
+        this.dialog = true
+      }
+    } catch (err) {
+      this.$router.push('/errors/404')
     }
   },
   beforeDestroy() {
@@ -290,6 +294,7 @@ export default {
     font-size: 15px;
     color: #2c2f34;
     line-height: 25px;
+    white-space: pre-line;
   }
   > .rating {
     display: flex;
