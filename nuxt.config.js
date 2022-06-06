@@ -39,6 +39,7 @@ export default {
   publicRuntimeConfig: {
     NODE_ENV: process.env.NODE_ENV,
     API_BASE_URL: process.env.API_BASE_URL,
+    RECOMMENDER_BASE_URL: process.env.RECOMMENDER_BASE_URL
   },
 
   // Auto import components: https://go.nuxtjs.dev/config-components

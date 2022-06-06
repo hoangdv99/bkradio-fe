@@ -83,4 +83,10 @@ export default class Audios {
   static async getLastViewedAudios(userId) {
     return await apis.audioApi.get(`history?userId=${userId}`).json()
   }
+
+  static async getRecommendAudios(userId) {
+    const res = await apis.recommender.get(`predict?user_id=${userId}`)
+    console.log(await res.json())
+    return await apis.recommender.get(`predict?user_id=${userId}`).json()
+  }
 }
