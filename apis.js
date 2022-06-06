@@ -3,9 +3,9 @@ import ky from 'ky-universal'
 export const apis = {}
 export const tasks = []
 
-function createAPI({ $auth, redirect, $config }) {
+function createAPI(baseURL, $auth, redirect) {
   return ky.create({
-    prefixUrl: $config.API_BASE_URL,
+    prefixUrl: baseURL,
     timeout: 30000,
     credentials: 'include',
     hooks: {
@@ -45,8 +45,9 @@ export async function loading(promise) {
   return returnValue
 }
 
-export default function (context) {
+export default function ({ $config, $auth, redirect }) {
   if (process.client) {
-    apis.audioApi = createAPI(context)
+    apis.audioApi = createAPI($config.API_BASE_URL, $auth, redirect)
+    apis.recommender = createAPI($config.RECOMMENDER_BASE_URL, $auth, redirect)
   }
 }

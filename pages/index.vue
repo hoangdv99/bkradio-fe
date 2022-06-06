@@ -38,9 +38,12 @@
           :key="index"
           class="block-content"
         >
-          <nuxt-link v-if="audiosByType.audios.length" :to="`/audio/type/${audiosByType.type.slug}`" class="title">{{
-            audiosByType.type.name
-          }}</nuxt-link>
+          <nuxt-link
+            v-if="audiosByType.audios.length"
+            :to="`/audio/type/${audiosByType.type.slug}`"
+            class="title"
+            >{{ audiosByType.type.name }}</nuxt-link
+          >
           <vue-slick-carousel v-bind="settings">
             <div class="wrapped-slide">
               <div
@@ -77,14 +80,37 @@
     </div>
     <div v-else class="wrapper">
       <div class="content">
+        <div v-if="recommendAudios.length" class="block-content">
+          <p class="title">Gợi ý cho bạn</p>
+          <vue-slick-carousel v-bind="settings">
+            <div class="wrapped-slide">
+              <div
+                v-for="audio in recommendAudios.slice(0,6)"
+                :key="audio.id"
+                :style="{ backgroundImage: `url(${audio.thumbnailUrl})` }"
+                class="post"
+                @click="goToDetailPage(audio)"
+              >
+                <div class="overlay">
+                  <span class="title"
+                    >{{ audio.title }} | {{ audio.author }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </vue-slick-carousel>
+        </div>
         <div
           v-for="(audiosByType, index) in audios.audiosByTypes"
           :key="index"
           class="block-content"
         >
-          <nuxt-link v-if="audiosByType.audios.length" :to="`/audio/type/${audiosByType.type.slug}`" class="title">{{
-            audiosByType.type.name
-          }}</nuxt-link>
+          <nuxt-link
+            v-if="audiosByType.audios.length"
+            :to="`/audio/type/${audiosByType.type.slug}`"
+            class="title"
+            >{{ audiosByType.type.name }}</nuxt-link
+          >
           <vue-slick-carousel v-bind="settings">
             <div class="wrapped-slide">
               <div
@@ -130,6 +156,7 @@ import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
 import Audios from '~/models/audios'
 import { createNamespacedHelpers } from '@/util'
 const { $get } = createNamespacedHelpers('layout')
+const audiosStore = createNamespacedHelpers('audios')
 export default {
   name: 'IndexPage',
   components: {
@@ -149,16 +176,18 @@ export default {
   },
   computed: {
     device: $get('device'),
+    recommendAudios: audiosStore.$get('recommendAudios')
   },
   async mounted() {
     this.audios = await Audios.getHomeAudios()
+    if (this.$auth.loggedIn && !this.recommendAudios?.length) audiosStore.$dispatch('getRecommendAudios', this.$auth.user.userId)
   },
   methods: {
     generateThumbnail(audio) {
       return `{ backgroundImage: ${audio.thumbnailUrl} }`
     },
     getFirstSlide(audios) {
-      if (audios.length > 6) {
+      if (audios?.length > 6) {
         const temp = [...audios]
         return temp.splice(0, 6)
       }

@@ -1,4 +1,5 @@
 import { get, dispatch, sync, commit } from 'vuex-pathify'
+import { camel } from "to-case/lib/cases"
 
 export const createNamespacedHelpers = (moduleName) => {
   return {
@@ -22,4 +23,11 @@ const generatePath = (moduleName, path) => {
   } else {
     return `${moduleName}/${path}`
   }
+}
+
+export function camelize(obj) {
+  return Object.entries(obj).reduce((o, [key, value]) => {
+    o[camel(key)] = value
+    return o
+  }, {})
 }

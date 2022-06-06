@@ -1,7 +1,7 @@
 import { make } from 'vuex-pathify'
 import Voices from '@/models/voices'
 import Audios from '@/models/audios'
-import { createNamespacedHelpers } from '~/util'
+import { createNamespacedHelpers, camelize } from '~/util'
 const { $dispatch } = createNamespacedHelpers('layout')
 
 export const state = () => ({
@@ -9,6 +9,7 @@ export const state = () => ({
   voices: [],
   audios: [],
   topics: [],
+  recommendAudios: [],
 })
 
 export const mutations = {
@@ -66,4 +67,9 @@ export const actions = {
     const topics = await Audios.getTopics()
     commit('SET_TOPICS', topics)
   },
+  async getRecommendAudios({ commit }, userId) {
+    const audios = await Audios.getRecommendAudios(userId)
+    const filteredAudios = audios.filter(audio => audio !== null)
+    commit('SET_RECOMMEND_AUDIOS', filteredAudios.map(audio => camelize(audio)))
+  }
 }
