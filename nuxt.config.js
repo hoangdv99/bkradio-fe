@@ -34,6 +34,7 @@ export default {
     { src: '~/plugins/vue-star-rating', mode: 'client' },
     '~/apis',
     '~/plugins/mixin',
+    { src: '~/plugins/ckeditor', mode: 'client' },
   ],
 
   publicRuntimeConfig: {

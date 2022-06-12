@@ -35,14 +35,15 @@
           ></v-text-field>
         </v-col>
         <v-col class="pt-0">
-          <v-textarea
+          <!-- <v-textarea
             v-model="audio.description"
             outlined
             name="input-7-4"
             label="Mô tả"
             counter="5000"
             no-resize
-          ></v-textarea>
+          ></v-textarea> -->
+          <ckeditor v-model="audio.description"></ckeditor>
         </v-col>
         <div>
           <v-autocomplete

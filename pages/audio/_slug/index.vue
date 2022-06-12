@@ -35,7 +35,7 @@
               ></audio>
             </vue-plyr>
           </div>
-          <div class="description">{{ audio.description }}</div>
+          <div class="description" v-html="audio.description"></div>
           <p class="notice">
             Các bạn nếu không nghe được audio, vui lòng gửi thông báo ở phần
             bình luận bên dưới. Ad sẽ chỉnh sửa trong thời gian sớm nhất, thanks

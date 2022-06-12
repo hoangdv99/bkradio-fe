@@ -31,9 +31,8 @@
             <p v-else class="text-left mb-0">
               Ngày cập nhật: {{ new Date(item.updatedAt).toLocaleDateString() }}
             </p>
-            <p class="text-left mb-0 summary">
-              {{ item.description || 'Thêm mô tả' }}
-            </p>
+            <div class="text-left mb-0 summary" v-html="item.description">
+            </div>
           </div>
         </div>
       </template>
