@@ -35,7 +35,7 @@
           <span class="name">{{ comment.username }}</span>
           <span class="time">{{ convertTime(comment.createdAt) }}</span>
           <p class="text">{{ comment.content }}</p>
-          <div class="actions">
+          <div v-if="$auth.loggedIn" class="actions">
             <button
               class="reply"
               @click="comment.showReplyInput = !comment.showReplyInput"
@@ -99,7 +99,7 @@
                 <span class="name">{{ reply.username }}</span>
                 <span class="time">{{ convertTime(reply.createdAt) }}</span>
                 <p class="text">{{ reply.content }}</p>
-                <div class="actions">
+                <div v-if="$auth.loggedIn" class="actions">
                   <button
                     class="reply"
                     @click="comment.showReplyInput = !comment.showReplyInput"
