@@ -7,14 +7,6 @@ export default class Audios {
     })
   }
 
-  static async uploadFile(formData) {
-    return await apis.audioApi.post('audios/upload', {
-      json: {
-        aud: 'lol'
-      }
-    })
-  }
-
   static async getHomeAudios() {
     return await apis.audioApi.get('home').json()
   }
@@ -86,5 +78,14 @@ export default class Audios {
 
   static async getRecommendAudios(userId) {
     return await apis.recommender.get(`predict?user_id=${userId}`).json()
+  }
+
+  static async convertPdfFile({ pdf, voiceId }) {
+    const formData = new FormData()
+    formData.append('files', pdf)
+    formData.append('voiceId', voiceId)
+    return await apis.audioApi.post(`audios/convert`, {
+      body: formData
+    }).json()
   }
 }

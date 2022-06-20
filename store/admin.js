@@ -106,4 +106,8 @@ export const actions = {
       })
     }
   },
+  async convertPdfFile({ commit }, payload) {
+    const { url } = await Audios.convertPdfFile(payload)
+    return url
+  }
 }

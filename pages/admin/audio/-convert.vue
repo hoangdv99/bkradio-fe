@@ -2,13 +2,13 @@
   <div class="text-center">
     <v-dialog v-model="dialog" width="1000" persistent>
       <template #activator="{ on, attrs }">
-        <v-btn color="blue-grey" dark v-bind="attrs" v-on="on">
-          <v-icon left dark> mdi-cloud-upload </v-icon>
-          Tải audio lên
+        <v-btn color="orange" dark v-bind="attrs" v-on="on">
+          <v-icon left dark> mdi-swap-horizontal </v-icon>
+          Chuyển đổi kịch bản
         </v-btn>
       </template>
       <v-card v-if="!selectedFile">
-        <v-card-title class="white mb-2"> Tải audio lên </v-card-title>
+        <v-card-title class="white mb-2"> Tải kịch bản </v-card-title>
         <v-card-text class="text-center">
           <div>
             <v-btn
@@ -19,20 +19,18 @@
               :loading="isSelecting"
               @click="onUploadBtnClick"
             >
-              <v-icon dark> mdi-cloud-upload </v-icon>
+              <v-icon dark> mdi-swap-horizontal </v-icon>
             </v-btn>
             <input
               ref="uploader"
               class="d-none"
               type="file"
-              accept="audio/*"
-              @change="onAudioChanged"
+              accept="application/pdf"
+              @change="onFileChange"
             />
           </div>
-          <p class="mt-2 font-weight-bold">Chọn tệp audio để tải lên</p>
-          <p>
-            Các video của bạn sẽ ở chế độ riêng tư cho đến khi bạn xuất bản.
-          </p>
+          <p class="mt-2 font-weight-bold">Chọn kịch bản để chuyển đổi</p>
+          <p>Chỉ chấp nhận file tải lên có định dạng PDF</p>
         </v-card-text>
         <v-card-actions>
           <v-btn color="error" text @click="dialog = false"> Đóng </v-btn>
@@ -40,7 +38,7 @@
       </v-card>
       <v-card v-else>
         <v-card-title class="white mb-2">
-          {{ selectedFile.name }}
+          {{ audio.title }}
         </v-card-title>
         <v-card-text>
           <h2>Chi tiết</h2>
@@ -56,15 +54,6 @@
                   required
                 ></v-text-field>
               </v-col>
-              <!-- <v-col full-width class="pt-0">
-                <v-textarea
-                  v-model="audio.description"
-                  outlined
-                  name="input-7-4"
-                  label="Mô tả"
-                  counter="5000"
-                ></v-textarea>
-              </v-col> -->
               <v-col class="pt-0">
                 <ckeditor v-model="audio.description"></ckeditor>
               </v-col>
@@ -105,21 +94,6 @@
                   required
                 ></v-text-field>
               </v-col>
-              <div class="d-flex flex-row justify-start">
-                <v-autocomplete
-                  v-model="audio.voiceId"
-                  :items="realVoices"
-                  :rules="rules.voice"
-                  class="d-flex pt-0 ml-3"
-                  label="Giọng đọc"
-                  item-text="name"
-                  item-value="id"
-                  dense
-                  outlined
-                  required
-                ></v-autocomplete>
-                <new-voice-popup class="mt-0"></new-voice-popup>
-              </div>
             </v-col>
             <v-col cols="4" class="audio">
               <p>Thumbnail</p>
@@ -138,7 +112,7 @@
                     audio.thumbnailUrl ||
                     require('@/assets/images/no-photo.png')
                   "
-                  width="100%"
+                  width="80%"
                   class="mb-2"
                 ></v-img>
                 <v-btn
@@ -158,17 +132,44 @@
                   @change="onThumbnailChanged"
                 />
               </div>
-              <p v-if="isUploading">Đang tải audio lên...</p>
-              <audio v-else controls class="mb-2">
-                <source :src="audio.audioUrl" :type="selectedFile.type" />
+              <div class="convert-area">
+                <p>{{ selectedFile.name }}</p>
+                <div class="d-flex flex-column justify-start">
+                  <v-autocomplete
+                    v-model="audio.voiceId"
+                    :items="ttsVoices"
+                    :rules="rules.voice"
+                    class="d-flex pt-0"
+                    label="Giọng đọc"
+                    :item-text="(item) => formatVoiceLabel(item)"
+                    item-value="id"
+                    dense
+                    outlined
+                    required
+                  ></v-autocomplete>
+                  <v-btn
+                    depressed
+                    color="primary"
+                    :disabled="isConverting || audio.audioUrl"
+                    @click="convertPdf"
+                  >
+                    {{ isConverting ? 'Đang chuyển đổi...' : 'Chuyển đổi' }}
+                  </v-btn>
+                </div>
+              </div>
+              <audio v-if="audio.audioUrl" controls class="mb-2">
+                <source :src="audio.audioUrl" type="audio/mp3" />
               </audio>
-              <p class="mb-0">Audio link</p>
-              <a :href="audio.audioUrl">{{ audio.audioUrl }}</a>
             </v-col>
           </div>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="error" text :disabled="isUploading" @click="close">
+          <v-btn
+            color="error"
+            text
+            :disabled="isConverting"
+            @click="dialog = false"
+          >
             Đóng
           </v-btn>
           <v-spacer></v-spacer>
@@ -181,34 +182,24 @@
   </div>
 </template>
 <script>
-import NewVoicePopup from './-@newVoicePopup.vue'
 import { createNamespacedHelpers } from '~/util'
 import firebaseStorage from '~/mixins/firebaseStorage'
-const { $get, $dispatch } = createNamespacedHelpers('admin')
-const layoutHelper = createNamespacedHelpers('layout')
+const layoutStore = createNamespacedHelpers('layout')
+const adminStore = createNamespacedHelpers('admin')
 
 export default {
-  name: 'UploadButton',
-  components: {
-    NewVoicePopup,
-  },
+  name: 'ConvertButton',
   mixins: [firebaseStorage],
   data() {
     return {
       dialog: false,
       selectedFile: null,
       isSelecting: false,
-      isUploading: false,
-      rules: {
-        title: [(value) => !!value || 'Tiêu đề không được bỏ trống'],
-        author: [(value) => !!value || 'Tác giả không được bỏ trống'],
-        topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
-      },
       audio: {
         title: null,
         description: null,
         author: null,
-        voiceId: 0,
+        voiceId: 35,
         thumbnailUrl: null,
         audioUrl: null,
         topicIds: [],
@@ -221,21 +212,23 @@ export default {
         { value: 3, label: 'Sách nói' },
         { value: 4, label: 'Podcast' },
       ],
+      rules: {
+        title: [(value) => !!value || 'Tiêu đề không được bỏ trống'],
+        author: [(value) => !!value || 'Tác giả không được bỏ trống'],
+        topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
+      },
+      isConverting: false,
     }
   },
   computed: {
-    voices: $get('voices'),
-    topics: $get('topics'),
+    topics: adminStore.$get('topics'),
     formIsValid() {
-      return !this.isUploading && this.audio.title && this.audio.author
+      return !this.isConverting && this.audio.title && this.audio.author
     },
-    realVoices() {
-      return this.voices.filter(voice => !voice.isTtsVoice)
-    }
-  },
-  mounted() {
-    if (!this.voices.length) $dispatch('getVoices')
-    if (!this.topics.length) $dispatch('getTopics')
+    voices: adminStore.$get('voices'),
+    ttsVoices() {
+      return this.voices.filter((voice) => voice.isTtsVoice)
+    },
   },
   methods: {
     onUploadBtnClick() {
@@ -250,27 +243,24 @@ export default {
 
       this.$refs.uploader.click()
     },
-    async onAudioChanged(e) {
+    onFileChange(e) {
       this.selectedFile = e.target.files[0]
-      if (!this.selectedFile.type.match('audio.*')) {
+      if (!this.selectedFile.type.match('application/pdf')) {
         this.selectedFile = null
-        return layoutHelper.$dispatch('setSnackbar', {
+        return layoutStore.$dispatch('setSnackbar', {
           showing: true,
           text: 'Sai định dạng file',
           color: 'error',
         })
       }
       this.audio.title = this.selectedFile.name.replace(/\.[^/.]+$/, '')
-      this.isUploading = true
-      const { link } = await this.uploadSingleFile('audio', this.selectedFile)
-      this.audio.audioUrl = link
-      this.isUploading = false
+      this.isConverting = false
     },
     onThumbnailChanged(e) {
       this.thumbnail = e.target.files[0]
       if (!this.thumbnail.type.match('image.*')) {
         this.thumbnail = null
-        return layoutHelper.$dispatch('setSnackbar', {
+        return layoutStore.$dispatch('setSnackbar', {
           showing: true,
           text: 'Sai định dạng file',
           color: 'error',
@@ -287,7 +277,7 @@ export default {
         this.audio.thumbnailUrl = link
       }
       if (
-        await $dispatch('createNewAudio', {
+        await adminStore.$dispatch('createNewAudio', {
           ...this.audio,
           userId: this.$auth.user.userId,
         })
@@ -305,19 +295,40 @@ export default {
         this.dialog = false
       }
     },
-    close() {
-      this.audio = {
-        title: null,
-        description: null,
-        author: null,
-        voiceId: null,
-        thumbnailUrl: null,
-        audioUrl: null,
+    formatVoiceLabel(voice) {
+      let gender, region
+      if (voice.gender === 1) {
+        gender = 'Nam'
+      } else if (voice.gender === 2) {
+        gender = 'Nữ'
       }
-      this.selectedFile = null
-      this.thumbnail = null
-      this.dialog = false
+      if (voice.region === 1) {
+        region = 'miền bắc'
+      } else if (voice.region === 2) {
+        region = 'miền trung'
+      } else if (voice.region === 3) {
+        region = 'miền nam'
+      }
+
+      return `${voice.name} (${gender} ${region})`
+    },
+    async convertPdf() {
+      this.isConverting = true
+      this.audio.audioUrl = await adminStore.$dispatch(
+        'convertPdfFile', {
+          pdf: this.selectedFile,
+          voiceId: this.audio.voiceId
+        }
+      )
+      this.isConverting = false
     },
   },
 }
 </script>
+<style lang="scss">
+.convert-area {
+  background-color: #fafafa;
+  margin-bottom: 8px;
+  padding: 10px;
+}
+</style>
