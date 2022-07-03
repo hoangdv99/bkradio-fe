@@ -7,10 +7,14 @@
           <nuxt-link to="/" class="link">Trang chủ</nuxt-link>
         </li>
         <li ref="shortStories" class="item">
-          <nuxt-link to="/audio/type/truyen-ngan" class="link">Truyện ngắn</nuxt-link>
+          <nuxt-link to="/audio/type/truyen-ngan" class="link"
+            >Truyện ngắn</nuxt-link
+          >
         </li>
         <li ref="longStories" class="item">
-          <nuxt-link to="/audio/type/truyen-dai" class="link">Truyện dài</nuxt-link>
+          <nuxt-link to="/audio/type/truyen-dai" class="link"
+            >Truyện dài</nuxt-link
+          >
         </li>
         <li ref="book" class="item">
           <nuxt-link to="/audio/type/sach-noi" class="link">Sách nói</nuxt-link>
@@ -50,6 +54,15 @@
                 >{{ voice.name }}</nuxt-link
               >
             </li>
+            <li class="list">
+              <nuxt-link
+                v-for="voice in ttsVoices"
+                :key="voice.id"
+                :to="'/voice/' + voice.slug"
+                class="item"
+                >{{ voice.name }}</nuxt-link
+              >
+            </li>
           </ul>
         </li>
       </ul>
@@ -62,8 +75,12 @@
         />
         <ul class="sub-menu">
           <li class="list">
-            <nuxt-link v-if="isAdmin" to="/admin/audio" class="item">Quản lý audio</nuxt-link>
-            <div class="item" @click="logout">Đăng xuất ({{ $auth.user.username }})</div>
+            <nuxt-link v-if="isAdmin" to="/admin/audio" class="item"
+              >Quản lý audio</nuxt-link
+            >
+            <div class="item" @click="logout">
+              Đăng xuất ({{ $auth.user.username }})
+            </div>
           </li>
         </ul>
       </div>
@@ -72,25 +89,35 @@
   </div>
 </template>
 <script>
-import Audios from '@/models/audios'
-import Voices from '@/models/voices'
-import { userRole } from "~/constants"
+import { userRole } from '~/constants'
+import { createNamespacedHelpers } from '@/util'
+const audioStore = createNamespacedHelpers('audios')
 export default {
   name: 'AppHeader',
-  data() {
-    return {
-      topics: [],
-      maleVoices: [],
-      femaleVoices: [],
-    }
-  },
   computed: {
     isAuthenticated() {
       return this.$store.getters.isAuthenticated
     },
     isAdmin() {
       return Boolean(this.$auth.user.roleId === userRole.ADMIN)
-    }
+    },
+    voices: audioStore.$get('voices'),
+    topics: audioStore.$get('topics'),
+    maleVoices() {
+      return this.voices.length
+        ? this.voices.filter((voice) => voice.gender === 1 && !voice.isTtsVoice)
+        : []
+    },
+    femaleVoices() {
+      return this.voices.length
+        ? this.voices.filter((voice) => voice.gender === 2 && !voice.isTtsVoice)
+        : []
+    },
+    ttsVoices() {
+      return this.voices.length
+        ? this.voices.filter((voice) => voice.isTtsVoice)
+        : []
+    },
   },
   watch: {
     $route(to, from) {
@@ -118,11 +145,9 @@ export default {
       }
     },
   },
-  async mounted() {
-    this.topics = await Audios.getTopics()
-    const totalVoices = await Voices.getVoices()
-    this.maleVoices = totalVoices.filter((voice) => voice.gender === 1)
-    this.femaleVoices = totalVoices.filter((voice) => voice.gender === 2)
+  mounted() {
+    if (!this.voices.length) audioStore.$dispatch('getVoices')
+    if (!this.topics.length) audioStore.$dispatch('getTopics')
   },
   methods: {
     async logout() {
@@ -135,12 +160,14 @@ export default {
         'topic',
         'shortStories',
         'longStories',
-        'book'
+        'book',
       ]
       tabs.splice(tabs.indexOf(tab), 1)
       this.$refs[tab].classList.add('-active')
-      tabs.forEach(unactiveTab => this.$refs[unactiveTab].classList.remove('-active'))
-    }
+      tabs.forEach((unactiveTab) =>
+        this.$refs[unactiveTab].classList.remove('-active')
+      )
+    },
   },
 }
 </script>
@@ -180,7 +207,7 @@ export default {
       display: block;
       &.-voices {
         display: flex;
-        width: 300px;
+        width: 400px;
       }
     }
     &.-active {
