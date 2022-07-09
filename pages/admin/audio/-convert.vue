@@ -147,19 +147,9 @@
                     outlined
                     required
                   ></v-autocomplete>
-                  <v-btn
-                    depressed
-                    color="primary"
-                    :disabled="isConverting || audio.audioUrl"
-                    @click="convertPdf"
-                  >
-                    {{ isConverting ? 'Đang chuyển đổi...' : 'Chuyển đổi' }}
-                  </v-btn>
+                  Bạn sẽ nhận được thông báo qua email sau khi quá trình chuyển đổi hoàn tất.
                 </div>
               </div>
-              <audio v-if="audio.audioUrl" controls class="mb-2">
-                <source :src="audio.audioUrl" type="audio/mp3" />
-              </audio>
             </v-col>
           </div>
         </v-card-text>
@@ -167,7 +157,6 @@
           <v-btn
             color="error"
             text
-            :disabled="isConverting"
             @click="dialog = false"
           >
             Đóng
@@ -217,13 +206,12 @@ export default {
         author: [(value) => !!value || 'Tác giả không được bỏ trống'],
         topic: [(value) => !!value || 'Thể loại không được bỏ trống'],
       },
-      isConverting: false,
     }
   },
   computed: {
     topics: adminStore.$get('topics'),
     formIsValid() {
-      return !this.isConverting && this.audio.title && this.audio.author
+      return this.audio.title
     },
     voices: adminStore.$get('voices'),
     ttsVoices() {
@@ -254,7 +242,6 @@ export default {
         })
       }
       this.audio.title = this.selectedFile.name.replace(/\.[^/.]+$/, '')
-      this.isConverting = false
     },
     onThumbnailChanged(e) {
       this.thumbnail = e.target.files[0]
@@ -277,9 +264,10 @@ export default {
         this.audio.thumbnailUrl = link
       }
       if (
-        await adminStore.$dispatch('createNewAudio', {
+        await adminStore.$dispatch('convertPdfFile', {
           ...this.audio,
           userId: this.$auth.user.userId,
+          pdf: this.selectedFile
         })
       ) {
         this.audio = {
@@ -311,16 +299,6 @@ export default {
       }
 
       return `${voice.name} (${gender} ${region})`
-    },
-    async convertPdf() {
-      this.isConverting = true
-      this.audio.audioUrl = await adminStore.$dispatch(
-        'convertPdfFile', {
-          pdf: this.selectedFile,
-          voiceId: this.audio.voiceId
-        }
-      )
-      this.isConverting = false
     },
   },
 }

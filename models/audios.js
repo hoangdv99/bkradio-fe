@@ -80,10 +80,17 @@ export default class Audios {
     return await apis.recommender.get(`predict?user_id=${userId}`).json()
   }
 
-  static async convertPdfFile({ pdf, voiceId }) {
+  static async convertPdfFile(payload) {
+    const { pdf, author, description, thumbnailUrl, title, userId, voiceId, topicIds } = payload
     const formData = new FormData()
     formData.append('files', pdf)
     formData.append('voiceId', voiceId)
+    formData.append('author', author)
+    formData.append('description', description)
+    formData.append('title', title)
+    formData.append('thumbnailUrl', thumbnailUrl)
+    formData.append('userId', userId)
+    formData.append('topicIds', topicIds)
     return await apis.audioApi.post(`audios/convert`, {
       body: formData
     }).json()

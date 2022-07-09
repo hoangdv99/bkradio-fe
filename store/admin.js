@@ -106,8 +106,22 @@ export const actions = {
       })
     }
   },
-  async convertPdfFile({ commit }, payload) {
-    const { url } = await Audios.convertPdfFile(payload)
-    return url
+  async convertPdfFile({ commit, dispatch }, payload) {
+    try {
+      const newAudio = await Audios.convertPdfFile(payload)
+      $dispatch('setSnackbar', {
+        showing: true,
+        text: 'Thêm audio mới thành công',
+        color: 'success'
+      })
+      dispatch('getAudios')
+      return newAudio
+    } catch (error) {
+      $dispatch('setSnackbar', {
+        showing: true,
+        text: error.message,
+        color: 'error'
+      })
+    }
   }
 }

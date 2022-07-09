@@ -166,9 +166,10 @@ export default {
       const currentPlayingTime = this.$refs.player?.currentTime
       if (currentPlayingTime > 0) {
         const audioLength = this.$refs.player.duration
+        const userId = this.$auth.user ? this.$auth.user.userId : null
         await Audios.saveHistory(
           this.audio.id,
-          this.$auth.user.userId,
+          userId,
           currentPlayingTime,
           audioLength
         )
