@@ -136,7 +136,7 @@
                 <p>{{ selectedFile.name }}</p>
                 <div class="d-flex flex-column justify-start">
                   <v-autocomplete
-                    v-model="audio.voiceId"
+                    v-model="audio.voiceIds"
                     :items="ttsVoices"
                     :rules="rules.voice"
                     class="d-flex pt-0"
@@ -146,6 +146,9 @@
                     dense
                     outlined
                     required
+                    small-chips
+                    deletable-chips
+                    multiple
                   ></v-autocomplete>
                   Bạn sẽ nhận được thông báo qua email sau khi quá trình chuyển đổi hoàn tất.
                 </div>
@@ -188,7 +191,7 @@ export default {
         title: null,
         description: null,
         author: null,
-        voiceId: 35,
+        voiceIds: [],
         thumbnailUrl: null,
         audioUrl: null,
         topicIds: [],

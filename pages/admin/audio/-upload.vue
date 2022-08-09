@@ -286,6 +286,10 @@ export default {
         )
         this.audio.thumbnailUrl = link
       }
+      this.audio.links = [{
+        voiceId: this.audio.voiceId,
+        link: this.audio.audioUrl,
+      }]
       if (
         await $dispatch('createNewAudio', {
           ...this.audio,

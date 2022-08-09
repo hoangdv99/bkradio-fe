@@ -11,7 +11,17 @@
             <h1 class="title">
               {{ audio.title + ' | ' + audio.author }}
             </h1>
-            <h2 class="subtitle">Giọng Đọc : {{ audio.voice }}</h2>
+            <h2 class="subtitle">
+              Giọng Đọc :
+              <span
+                v-for="(link, index) in audio.links"
+                :key="'voice' + index"
+                class="voice"
+                :class="activeLink(link.voice.name)"
+                @click="changeLink(link.voice.name)"
+                >{{ link.voice.name }}
+              </span>
+            </h2>
             <div class="statistic">
               <div class="comment">
                 <v-icon small>mdi-comment</v-icon>
@@ -31,7 +41,7 @@
                 controls
                 crossorigin
                 playsinline
-                :src="audio.url"
+                :src="selectedLink"
               ></audio>
             </vue-plyr>
           </div>
@@ -61,16 +71,19 @@
           <div class="tags">
             <nuxt-link
               v-for="(topic, index) in audio.topics"
-              :key="index"
+              :key="'topic' + index"
               :to="genTopicTagLink(topic)"
               class="tag"
               >#{{ topic }}</nuxt-link
             >
             <nuxt-link
-              v-if="audio.voice !== 'Unknown'"
-              :to="genVoiceTagLink()"
+              v-for="(link, index) in audio.links.filter(
+                (link) => link.voice.name !== 'Unknown'
+              )"
+              :key="'link' + index"
+              :to="genVoiceTagLink(link.voice.name)"
               class="tag"
-              >#{{ audio.voice }}</nuxt-link
+              >#{{ link.voice.name }}</nuxt-link
             >
           </div>
         </div>
@@ -88,7 +101,7 @@
           <v-card-title class="text-h5"> Tiếp tục nghe? </v-card-title>
           <v-card-text
             >Lần trước bạn đã nghe đến
-            {{ convertTime(audio.history) }}</v-card-text
+            {{ convertTime(audio.history.currentListeningTime) }}</v-card-text
           >
           <v-card-actions class="d-flex justify-space-between">
             <v-btn
@@ -130,19 +143,28 @@ export default {
       audio: null,
       dialog: false,
       commentAmount: 0,
+      selectedVoice: null,
+      selectedLink: null,
     }
   },
   computed: {
     device: $get('device'),
+    // selectedLink() {
+    //   return this.audio.links.find(
+    //     (link) => link.voice.name === this.selectedVoice
+    //   )
+    // },
   },
   beforeMount() {
     window.addEventListener('beforeunload', this.saveHistory)
   },
-  async mounted() {
+  async created() {
     try {
       this.audio = await Audios.getAudioBySlug(this.$route.params.slug)
+      this.selectedVoice = this.audio.links[0].voice.name
+      this.selectedLink = this.audio.links[0].url
       await Audios.updateView(this.audio.id)
-      if (this.audio.history && this.audio.history > 0) {
+      if (this.audio.history && this.audio.history.currentListeningTime > 0) {
         this.dialog = true
       }
     } catch (err) {
@@ -167,11 +189,15 @@ export default {
       if (currentPlayingTime > 0) {
         const audioLength = this.$refs.player.duration
         const userId = this.$auth.user ? this.$auth.user.userId : null
+        const { id: listeningLinkId } = this.audio.links.find(
+          (link) => link.url === this.selectedLink
+        )
         await Audios.saveHistory(
           this.audio.id,
           userId,
           currentPlayingTime,
-          audioLength
+          audioLength,
+          listeningLinkId
         )
       }
     },
@@ -183,9 +209,15 @@ export default {
       this.$refs.player.play()
     },
     resumeListening() {
+      const link = this.audio.links.find(link => link.id === this.audio.history.audioLinkId)
+      this.selectedLink = link.url
+      this.selectedVoice = link.voice.name
       this.dialog = false
-      this.$refs.player.currentTime = this.audio.history
-      this.$refs.player.play()
+      const self = this
+      setTimeout(function() {
+        self.$refs.player.currentTime = self.audio.history.currentListeningTime
+        self.$refs.player.play()
+      }, 150)
     },
     setCommentsAmount(number) {
       this.commentAmount = number
@@ -193,8 +225,18 @@ export default {
     genTopicTagLink(topic) {
       return `/topic/${slugify(topic, { lower: true })}`
     },
-    genVoiceTagLink() {
-      return `/voice/${slugify(this.audio.voice, { lower: false })}`
+    genVoiceTagLink(voiceName) {
+      return `/voice/${slugify(voiceName, { lower: false })}`
+    },
+    activeLink(voiceName) {
+      return voiceName === this.selectedVoice ? '-active' : ''
+    },
+    changeLink(voiceName) {
+      this.selectedVoice = voiceName
+      const { url } = this.audio.links.find(
+        (link) => link.voice.name === voiceName
+      )
+      this.selectedLink = url
     },
   },
 }
@@ -250,6 +292,19 @@ export default {
     color: #777777;
     font-family: inherit;
     letter-spacing: 0;
+  }
+  > .header > .subtitle > .voice {
+    border-right: 4px solid #ccc;
+    padding-right: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+    &:hover {
+      color: #9ebaa0;
+    }
+    &.-active {
+      text-decoration: underline;
+      color: #9ebaa0;
+    }
   }
   > .header > .statistic {
     display: flex;
@@ -324,6 +379,7 @@ export default {
   }
   > .tags {
     display: flex;
+    flex-direction: row;
     flex-flow: wrap;
     justify-content: center;
     padding: 0 30px 20px;

@@ -80,7 +80,7 @@
             required
           ></v-text-field>
         </v-col>
-        <v-col cols="6" class="d-flex flex-row justify-start pt-0">
+        <!-- <v-col cols="6" class="d-flex flex-row justify-start pt-0">
           <v-autocomplete
             v-model="audio.voiceId"
             :items="voices"
@@ -93,7 +93,7 @@
             required
           ></v-autocomplete>
           <new-voice-popup class="mt-0 ml-2"></new-voice-popup>
-        </v-col>
+        </v-col> -->
       </v-col>
       <v-col cols="4" class="audio-section pt-5">
         <p>Thumbnail</p>
@@ -115,11 +115,25 @@
             @change="onThumbnailChanged"
           />
         </div>
-        <audio v-if="audio.url" controls class="mb-4 audio">
-          <source :src="audio.url" type="audio/mpeg" />
-        </audio>
+        <p class="mb-0">Giọng đọc</p>
+        <span
+          v-for="(link, index) in audio.links"
+          :key="'link' + index"
+          class="voice"
+          :class="activeLink(link.name)"
+          @click="changeLink(link)"
+          >{{ link.name }}</span
+        >
+        <audio
+          ref="player"
+          controls
+          crossorigin
+          playsinline
+          :src="selectedLink"
+          class="audio"
+        ></audio>
         <p class="mb-0">Audio link</p>
-        <a :href="audio.url" target="_blank">{{ audio.url }}</a>
+        <a :href="selectedLink" target="_blank">{{ selectedLink }}</a>
         <v-col class="d-flex pl-0 pr-0 pt-4">
           <v-select
             v-model="audio.status"
@@ -137,7 +151,7 @@
 </template>
 <script>
 import { createNamespacedHelpers } from '~/util'
-import newVoicePopup from '@/pages/admin/audio/-@newVoicePopup.vue'
+// import newVoicePopup from '@/pages/admin/audio/-@newVoicePopup.vue'
 import firebaseStorage from '~/mixins/firebaseStorage'
 import Audios from '@/models/audios'
 const { $get, $dispatch } = createNamespacedHelpers('admin')
@@ -150,9 +164,9 @@ export default {
       showSidebar: false,
     }
   },
-  components: {
-    newVoicePopup,
-  },
+  // components: {
+  //   newVoicePopup,
+  // },
   mixins: [firebaseStorage],
   middleware: ['isAuthenticated', 'isAdmin'],
   data() {
@@ -184,6 +198,8 @@ export default {
         { value: 3, label: 'Sách nói' },
         { value: 4, label: 'Podcast' },
       ],
+      selectedVoice: null,
+      selectedLink: null,
     }
   },
   computed: {
@@ -197,6 +213,8 @@ export default {
     if (!this.voices.length) $dispatch('getVoices')
     if (!this.topics.length) $dispatch('getTopics')
     this.audio = await Audios.getAudio(this.$route.query.audioId)
+    this.selectedVoice = this.audio.links[0].name
+    this.selectedLink = this.audio.links[0].link
   },
   methods: {
     async save() {
@@ -248,6 +266,14 @@ export default {
       )
       this.$refs.uploader.click()
     },
+    activeLink(voiceName) {
+      return voiceName === this.selectedVoice ? '-active' : ''
+    },
+    changeLink(link) {
+      console.log(link)
+      this.selectedVoice = link.name
+      this.selectedLink = link.link
+    },
   },
 }
 </script>
@@ -255,6 +281,23 @@ export default {
 .audio-section {
   > .audio {
     width: 100%;
+    margin: 5px 0;
+  }
+  > .voice {
+    padding-right: 10px;
+    border-right: 2px solid #ccc;
+    margin-right: 10px;
+    &:hover {
+      cursor: pointer;
+      color: #9ebaa0;
+    }
+    &.-active {
+      text-decoration: underline;
+      color: #9ebaa0;
+    }
+    &:last-of-type {
+      border: none;
+    }
   }
 }
 .main {

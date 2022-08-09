@@ -61,13 +61,14 @@ export default class Audios {
     return await apis.audioApi.get(`audios/trending?period=${period}`).json()
   }
 
-  static async saveHistory(audioId, userId, time, audioLength) {
+  static async saveHistory(audioId, userId, time, audioLength, listeningLinkId) {
     return await apis.audioApi.post('history', {
       json: {
         audioId,
         userId,
         time,
-        audioLength
+        audioLength,
+        listeningLinkId
       }
     })
   }
@@ -81,10 +82,10 @@ export default class Audios {
   }
 
   static async convertPdfFile(payload) {
-    const { pdf, author, description, thumbnailUrl, title, userId, voiceId, topicIds } = payload
+    const { pdf, author, description, thumbnailUrl, title, userId, voiceIds, topicIds } = payload
     const formData = new FormData()
     formData.append('files', pdf)
-    formData.append('voiceId', voiceId)
+    formData.append('voiceIds', voiceIds)
     formData.append('author', author)
     formData.append('description', description)
     formData.append('title', title)
