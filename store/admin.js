@@ -111,7 +111,7 @@ export const actions = {
       const newAudio = await Audios.convertPdfFile(payload)
       $dispatch('setSnackbar', {
         showing: true,
-        text: 'Thêm audio mới thành công',
+        text: 'Thêm thành công. Kết quả chuyển đổi sẽ được thông báo qua email.',
         color: 'success'
       })
       dispatch('getAudios')
